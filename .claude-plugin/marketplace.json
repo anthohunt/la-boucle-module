@@ -1,0 +1,12 @@
+{
+  "name": "la-boucle",
+  "description": "La boucle v2: a Claude Code mod that conducts a worksite of the method in 5 steps",
+  "owner": { "name": "Anthony Hunt" },
+  "plugins": [
+    {
+      "name": "la-boucle-v2",
+      "source": "./",
+      "description": "Control pane, band above the prompt and tools for one worksite of La boucle (early access mods API)"
+    }
+  ]
+}

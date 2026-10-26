@@ -1,0 +1,13 @@
+{
+  "racine_chantiers": "~/.la-boucle/chantiers",
+  "confirmations": { "dossier": "/var/lib/la-boucle-module/confirmations", "uid": 0 },
+  "releve_comptes": "",
+  "comptes": [
+    { "id": "compte-a", "nom": "Compte A" },
+    { "id": "compte-b", "nom": "Compte B" }
+  ],
+  "agents": { "lanceur": [], "dossier_fins": "~/.la-boucle/fins" },
+  "notification": { "active": false, "commande": [] },
+  "moteur": ["python3", "-m", "boucle"],
+  "bibliotheque": ""
+}

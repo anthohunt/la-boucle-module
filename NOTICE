@@ -1,0 +1,22 @@
+la-boucle-module
+Copyright 2026 Anthony Hunt
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+Documentation, the method files (programme/parcours.json, programme/methode.json,
+programme/categories.json), the templates under programme/gabarits/ and the format
+description programme/usage-interface.md are licensed under the Creative Commons
+Attribution 4.0 International license (see LICENSE-docs).
+
+This product contains no third-party source code. It is written for the Claude Code
+mods API (a Claude Code plugin with a hooks module); Claude Code is a separate product
+of Anthropic, subject to Anthropic's terms, and is not distributed here. The type
+declarations that Claude Code writes next to a mod (.claude-plugin/types/) are not
+redistributed: see the README.
+
+The failure checklist and the two-level research loop in programme/methode.json
+("greffes_h2") are inspired by the paper Harness^2 (Google Research, arXiv:2610.14224).
+No text or code of that paper is included.
+
+The template programme/gabarits/arbre-definitions.html links the Google Fonts stylesheet for the fonts
+Fraunces, Source Sans 3 and JetBrains Mono (SIL Open Font License 1.1). The fonts are loaded from Google at
+display time and are not distributed in this repository.

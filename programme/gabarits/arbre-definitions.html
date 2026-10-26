@@ -1,0 +1,115 @@
+<!doctype html>
+<!--
+  GABARIT — l'arbre des définitions présenté à l'utilisateur avant sa confirmation finale (fin de E1.5).
+  Gabarit à garder quand on présente la définition finale avant confirmation. Exemple de référence : un agent qui
+  pilote « Mini-tâches », une appli de tâches fictive.
+
+  Garder tel quel : le style (variables, polices, thème sombre), la légende, l'organigramme de haut en bas.
+  Remplacer seulement le contenu :
+  • la racine (.n.root) : ce que le modèle décide, ses sorties avec leurs seuils (.s.exe/.s.sug/.s.rien, autant que de
+    sorties), les règles du code qui forcent une sortie (.rule), et les seuils B1/B2 (.bars) — la racine est la seule
+    couche qui porte des seuils ;
+  • une branche par terme de couche 2 (<li>), ses sous-termes en <ul> imbriqués ; .n.modele = choisi par le modèle,
+    .n.code = lu ou écrit par le code ; une liste fermée en .list (valeur à gauche, exemple ou effectif en <i> à droite).
+  Le nom du modèle (ici « l'agent ») et les libellés de la légende s'adaptent au chantier. Publier avec l'outil Artifact.
+-->
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Arbre des définitions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout : organigramme de haut en bas ; racine + seuils en tête, branches en dessous ; défilement horizontal dans son cadre si l'écran est étroit */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --fg:#1c2330; --muted:#5f6a7a; --line:#b9c3d0;
+  --modele:#2f6fb0; --modele-soft:#e4eefa; --code:#7a6526; --code-soft:#f4eedd;
+  --exe:#1f7a55; --exe-soft:#e1f3ea; --sug:#9a6512; --sug-soft:#fbefdc; --rien:#8a3b3b; --rien-soft:#f7e3e3;
+  --f-display:"Fraunces",Georgia,serif; --f-body:"Source Sans 3",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161d; --surface:#1a2029; --fg:#e6eaf0; --muted:#9aa5b5; --line:#465061;
+  --modele:#86b6ea; --modele-soft:#1c2c40; --code:#d8c084; --code-soft:#332b17;
+  --exe:#6fd1a5; --exe-soft:#163328; --sug:#e6b06a; --sug-soft:#382916; --rien:#e89a9a; --rien-soft:#3a1d1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161d; --surface:#1a2029; --fg:#e6eaf0; --muted:#9aa5b5; --line:#465061;
+  --modele:#86b6ea; --modele-soft:#1c2c40; --code:#d8c084; --code-soft:#332b17;
+  --exe:#6fd1a5; --exe-soft:#163328; --sug:#e6b06a; --sug-soft:#382916; --rien:#e89a9a; --rien-soft:#3a1d1d; color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 var(--f-body)}
+.wrap{padding-block:24px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font:600 26px/1.2 var(--f-display);margin:0 0 6px;text-align:center}
+.legend{display:flex;justify-content:center;gap:8px;margin-bottom:18px}
+.chip{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.modelec{background:var(--modele-soft);color:var(--modele)} .codec{background:var(--code-soft);color:var(--code)}
+.scroll{overflow-x:auto;padding-bottom:8px}
+.org{width:max-content;min-width:100%;display:flex;justify-content:center}
+.org ul{display:flex;justify-content:center;padding-top:22px;margin:0;padding-left:0;position:relative;list-style:none}
+.org li{position:relative;padding:22px 8px 0;display:flex;flex-direction:column;align-items:center}
+.org li::before,.org li::after{content:"";position:absolute;top:0;right:50%;width:50%;height:22px;border-top:2px solid var(--line)}
+.org li::after{right:auto;left:50%;border-left:2px solid var(--line)}
+.org li:only-child::before,.org li:only-child::after{display:none}
+.org li:only-child{padding-top:0}
+.org li:first-child::before,.org li:last-child::after{border:0 none}
+.org li:last-child::before{border-right:2px solid var(--line);border-radius:0 6px 0 0}
+.org li:first-child::after{border-radius:6px 0 0 0}
+.org ul ul::before{content:"";position:absolute;top:0;left:50%;height:22px;border-left:2px solid var(--line)}
+.org > ul{padding-top:0}
+.n{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-align:center;width:max-content;max-width:220px}
+.n .t{font-weight:600;display:block}
+.n .d{color:var(--muted);font-size:13px;display:block;margin-top:2px}
+.n .chip{margin-top:5px}
+.n.modele{border:2px solid var(--modele)} .n.code{border:2px solid var(--code)}
+.root{max-width:none;padding:12px 16px;border:2px solid var(--modele)}
+.root .t{font:600 18px var(--f-display)}
+.seuils{display:flex;gap:6px;margin-top:8px;justify-content:center}
+.s{border-radius:6px;padding:4px 10px;font-size:13px}
+.s b{display:block} .s span{font:12px var(--f-mono)}
+.exe{background:var(--exe-soft);color:var(--exe)} .sug{background:var(--sug-soft);color:var(--sug)} .rien{background:var(--rien-soft);color:var(--rien)}
+.rule{font-size:12px;color:var(--sug);margin-top:6px}
+.bars{font:12px var(--f-mono);color:var(--muted);margin-top:4px}
+.leaf{max-width:160px;padding:6px 10px}
+.leaf .t{font-size:14px}
+.list{display:flex;flex-direction:column;gap:3px;margin-top:6px;text-align:left}
+.list span{font-size:13px;background:var(--bg);border-radius:4px;padding:2px 8px}
+.list i{font-style:normal;color:var(--muted);float:right;margin-left:10px;font-variant-numeric:tabular-nums}
+.n.box{max-width:240px}
+</style></head><body>
+<div class="wrap">
+  <h1>Arbre des définitions — agent Mini-tâches</h1>
+  <div class="legend"><span class="chip modelec">choisi par l'agent</span><span class="chip codec">lu par le code</span></div>
+  <div class="scroll"><div class="org"><ul><li>
+    <div class="n root">
+      <span class="t">Action + paramètres</span>
+      <span class="d">une décision, avec sa confiance</span>
+      <div class="seuils">
+        <div class="s exe"><b>Exécuter</b><span>≥ 66 %</span></div>
+        <div class="s sug"><b>Suggérer</b><span>33–66 %</span></div>
+        <div class="s rien"><b>Ne rien faire</b><span>&lt; 33 %</span></div>
+      </div>
+      <div class="rule">Toujours suggérer : liste incomplète · action à confirmer · action inexistante</div>
+      <div class="bars">B1 ≥ 90 % · B2 ≥ 66 %</div>
+    </div>
+    <ul>
+      <li>
+        <div class="n modele"><span class="t">Action</span><span class="d">disponible sur l'écran</span></div>
+        <ul>
+          <li><div class="n modele box"><span class="t">Paramètres</span><span class="d">12 actions sur 30</span>
+            <div class="list"><span>Tâche nommée <i>« Appeler le plombier »</i></span><span>Date <i>« vendredi »</i></span><span>Texte libre <i>« Maison »</i></span><span>Suppression en masse <i>toujours suggérer</i></span></div></div></li>
+          <li><div class="n code box"><span class="t">Famille</span>
+            <div class="list"><span>Ordinaire</span><span>Bascule <i>dépend de l'état</i></span><span>Irréversible <i>toujours suggérer</i></span></div></div></li>
+          <li><div class="n code box"><span class="t">Type</span><span class="d">fixe les conditions d'écran</span>
+            <div class="list"><span>Sans cible <i>6</i></span><span>Affichage <i>5</i></span><span>Désigner une tâche <i>9</i></span><span>Changer une date <i>4</i></span><span>Créer, relier <i>3</i></span><span>Retirer <i>2</i></span><span>À confirmer <i>1</i></span></div></div></li>
+        </ul>
+      </li>
+      <li>
+        <div class="n code box"><span class="t">Écran affiché</span><span class="d">fiche écrite par l'appli</span>
+          <div class="list"><span>Écran <i>code</i></span><span>Tâche sélectionnée <i>code</i></span><span>Filtres actifs <i>code</i></span><span>Actions possibles maintenant <i>agent</i></span></div>
+          <span class="d">→ conditions selon le type : endroit · cible · départ</span></div>
+      </li>
+      <li>
+        <div class="n code box"><span class="t">Mémoire</span><span class="d">0 à 10 actions passées</span>
+          <div class="list"><span>Action · paramètres · résultat</span><span>Actions à la souris comprises</span></div></div>
+      </li>
+    </ul>
+  </li></ul></div></div>
+</div>
+</body></html>

@@ -1,0 +1,5 @@
+ecran	action	description
+Liste	afficher la semaine	montre les tâches de la semaine
+Liste	repousser une tâche	décale la date d'une tâche d'un ou plusieurs jours
+Liste	terminer une tâche	coche la tâche
+Outils	annuler	annule la dernière action

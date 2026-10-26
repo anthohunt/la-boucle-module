@@ -1,0 +1,41 @@
+{
+  "name": "la-boucle-v2",
+  "version": "0.1.0",
+  "description": "La boucle v2: conducts one worksite of the method end to end (5 steps) from Claude Code, with a control pane, a band above the prompt, and the operator's decisions recorded word for word. Only the session attached with /la-boucle-v2 <worksite> is concerned.",
+  "author": {
+    "name": "Anthony Hunt"
+  },
+  "license": "Apache-2.0",
+  "repository": "https://github.com/anthohunt/la-boucle-module",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "hote": {
+      "type": "string",
+      "title": "Host of the worksite program",
+      "description": "Empty (default): the program runs on this machine. Otherwise an SSH destination (user@host) where the module's program is installed.",
+      "default": "",
+      "required": false
+    },
+    "programme_distant": {
+      "type": "string",
+      "title": "Program path on the host",
+      "description": "Only with a host: absolute path of programme/boucle.py on that host.",
+      "default": "",
+      "required": false
+    },
+    "python": {
+      "type": "string",
+      "title": "Python command",
+      "description": "Python 3.10 or later, standard library only.",
+      "default": "python3",
+      "required": false
+    },
+    "nom_court": {
+      "type": "boolean",
+      "title": "Also answer /la-boucle",
+      "description": "The module also answers the short command /la-boucle. Leave off if another module already takes it.",
+      "default": false,
+      "required": false
+    }
+  }
+}
