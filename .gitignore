@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.claude-plugin/types/
+node_modules/
+/boucle-module.json
+*.bak
+*.log

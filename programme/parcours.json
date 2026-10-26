@@ -1,0 +1,575 @@
+{
+  "_role": "Parcours générique d'un chantier de La boucle. Aucune donnée propre à un chantier. « qui » : moi (l'utilisateur décide), agent (un agent travaille, l'utilisateur valide), programme (calculé, sans agent). Les chemins de « sortie » sont relatifs au dossier du chantier.",
+  "regles_communes": [
+    "Une seule question par message ; toute question à choix est en A/B/C avec une option « autre chose, précise-moi » écrite en clair parmi les autres.",
+    "Jamais de question ouverte nue ; jamais de question technique quand on parle de l'usage (note-la pour plus tard).",
+    "Chaque décision de l'utilisateur s'enregistre avec l'outil `decision`, ses mots exacts en citation, sous sa sous-étape.",
+    "Une sous-étape n'est validée (outil `avancer`, etat « validee ») que sur une réponse explicite de l'utilisateur, citée mot pour mot.",
+    "Une sortie de sous-étape s'écrit avec l'outil `ecrire` à l'endroit prévu par le parcours ; un fichier scellé ne se réécrit pas.",
+    "Langage simple : une image ou un exemple concret avant la règle ; jamais de jargon sans sa traduction ; l'utilisateur n'est pas statisticien.",
+    "Ce qui peut être calculé l'est par le programme, jamais estimé de tête par l'agent.",
+    "Quand l'utilisateur demande de rouvrir une sous-étape ou un point (souvent depuis le volet), demande-lui pourquoi s'il ne l'a pas dit, appelle l'outil `rouvrir` avec sa raison, et reprends la discussion sur cette sous-étape avec ce qui avait été dit."
+  ],
+  "etapes": [
+    {
+      "n": 1,
+      "titre": "L'objectif",
+      "resume": "Partir d'un besoin dit avec tes mots et arriver à un objectif complet, défini couche par couche, noté par une seule fonction, relu à l'aveugle, puis scellé.",
+      "tu_decides": "Le besoin, la catégorie, chaque point du cadrage, l'arbre des définitions, puis le scellement.",
+      "sous_etapes": [
+        {
+          "id": "E1.1",
+          "titre": "La bienvenue",
+          "qui": "moi",
+          "entree": "Le nom du chantier tapé avec /la-boucle <chantier>.",
+          "sortie": [
+            "chantier.json"
+          ],
+          "consigne": "Le bandeau de bienvenue est déjà affiché par le mode. Ne pose aucune question : attends que l'utilisateur dise qu'il est prêt. Son premier message valide la sous-étape (fait par le programme)."
+        },
+        {
+          "id": "E1.2",
+          "titre": "Le besoin, jusqu'à une vue globale",
+          "qui": "moi",
+          "entree": "Le dossier du chantier, bienvenue validée.",
+          "sortie": [
+            "etape1/besoin.md",
+            "etape1/questions-techniques.md"
+          ],
+          "consigne": "Le prochain message de l'utilisateur est sa description du besoin : ne demande jamais « que voulez-vous faire ? ». Reformule en une ou deux phrases et demande A) oui, c'est ça / B) non, je précise / C) autre chose, précise-moi. Description vague : au plus deux questions fermées, puis reformule quand même ; boucle jusqu'au oui. Puis 2 à 4 questions sur l'usage réel (qui s'en sert, à quel moment, ce qu'il en fait), une par message, en A/B/C. Les questions techniques sont notées dans questions-techniques.md. À la fin, écris la vue globale en quelques lignes ; une fois validée, écris besoin.md (description d'origine mot pour mot, reformulation acceptée, réponses sur l'usage)."
+        },
+        {
+          "id": "E1.3",
+          "titre": "La catégorie du besoin",
+          "qui": "moi",
+          "entree": "La vue globale validée (etape1/besoin.md) et les catégories connues du mode.",
+          "sortie": [
+            "chantier.json"
+          ],
+          "consigne": "Propose la catégorie que tu juges la bonne, avec la raison en une ligne : A) ta proposition (recommandée), B) l'autre catégorie, C) aucune ne convient, D) autre chose, précise-moi. Enregistre le choix avec l'outil `categorie` (raison, citation) : le programme ajoute les sous-étapes de la catégorie. Si aucune ne convient, le chantier suit le protocole classique et le cas est noté pour une future catégorie. Greffe G2 : une fois la catégorie choisie, regarde dans la bibliothèque (outil `bibliotheque`) ce que La boucle sait déjà pour cette catégorie, et dis-le en une phrase : ce sont des hypothèses, revérifiées plus tard sur le banc de ce chantier."
+        },
+        {
+          "id": "E1.3.1",
+          "titre": "Comprendre l'outil",
+          "qui": "agent",
+          "categorie": "agent-interaction-logicielle",
+          "entree": "La vue globale, la catégorie « agent d'interaction logicielle » et l'accès à l'outil.",
+          "sortie": [
+            "etape1/outil/catalogue.tsv",
+            "etape1/outil/confusions.md",
+            "etape1/outil/etat-outil.md",
+            "etape1/outil/source.md",
+            "etape1/outil/consignes-reelles.md"
+          ],
+          "consigne": "Demande l'accès à l'outil, par ordre de préférence : A) un dépôt git (idéal) ; B) un projet en ligne (code publié, doc, API) ; C) aucun code, reverse engineering en utilisant l'outil ; D) autre chose, précise-moi. Étudie l'outil sans jamais rien y modifier et dis d'où vient ta compréhension (commit lu, pages consultées, parcours faits). Rends : le catalogue des actions écran par écran, une action par ligne (catalogue.tsv : ecran, action, description) ; les actions faciles à confondre ; ce que l'outil sait à chaque instant. Demande-lui d'utiliser l'outil une dizaine de minutes en disant ce qu'il demanderait à l'assistant ; note ces consignes réelles mot pour mot (consignes-reelles.md) et vérifie que le catalogue les couvre toutes. Il corrige dans le chat et valide quand il reconnaît l'outil."
+        },
+        {
+          "id": "E1.4",
+          "titre": "Le cadrage",
+          "qui": "moi",
+          "entree": "La vue globale, la catégorie et, pour un agent d'interaction logicielle, la compréhension de l'outil.",
+          "sortie": [
+            "etape1/cadrage.json"
+          ],
+          "consigne": "Fais trancher les points du cadrage un à un, dans l'ordre, une question par message, en A/B/C avec une option « autre chose, précise-moi » ; pour un point technique, un exemple concret avant la règle. Chaque point tranché s'enregistre avec `decision` (champ point). Les seuils de qualité ne sont que proposés : enregistre-les aussi avec `registre`, statut « propose » ; ils seront scellés à l'étape 2. Les définitions par niveaux et les seuils B1/B2 de la couche racine ne se traitent pas ici (E1.5).",
+          "points": [
+            {
+              "id": "p01",
+              "titre": "Ce que le modèle décide"
+            },
+            {
+              "id": "p02",
+              "titre": "L'entrée complète"
+            },
+            {
+              "id": "p03",
+              "titre": "Les sorties possibles (type fermé)"
+            },
+            {
+              "id": "p04",
+              "titre": "Le matériel cible"
+            },
+            {
+              "id": "p05",
+              "titre": "Les variables qui comptent pour le client"
+            },
+            {
+              "id": "p06",
+              "titre": "Le petit modèle et son moteur"
+            },
+            {
+              "id": "p07",
+              "titre": "La fréquence réelle de chaque sortie"
+            },
+            {
+              "id": "p08",
+              "titre": "Le coût relatif des erreurs"
+            },
+            {
+              "id": "p09",
+              "titre": "La mesure de vitesse"
+            },
+            {
+              "id": "p10",
+              "titre": "Les seuils minimum et idéal (qualité, vitesse, taille)"
+            },
+            {
+              "id": "p11",
+              "titre": "La coupure par donnée"
+            },
+            {
+              "id": "p12",
+              "titre": "Les données du client"
+            },
+            {
+              "id": "p13",
+              "titre": "Les machines permises"
+            },
+            {
+              "id": "p14",
+              "titre": "La propriété du livrable"
+            },
+            {
+              "id": "p15",
+              "titre": "La catégorie réglementée"
+            },
+            {
+              "id": "p16",
+              "titre": "Les trois portes de passage, comprises"
+            }
+          ]
+        },
+        {
+          "id": "E1.5",
+          "titre": "Définir précisément, couche par couche",
+          "qui": "moi",
+          "entree": "Le cadrage (etape1/cadrage.json), surtout ce que le modèle décide et ses sorties, qui forment la couche 1.",
+          "sortie": [
+            "etape1/arbre-definitions.json"
+          ],
+          "consigne": "Explique d'abord le système en quelques lignes avec un exemple concret (tickets de support : couche 1 = urgent / à vérifier / rien ; couche 2 = « panne en cours », « client bloqué » ; couche 3 = produit concerné, type de panne, canal). Dis clairement : autant de sous-couches qu'on veut ; un terme peut s'arrêter « par définition » (liste fermée) ; une part restera toujours ambiguë, c'est voulu, c'est le travail du modèle. Puis guide couche par couche, une question à la fois : pour chaque terme, A) on le redécoupe, B) on le fixe par une liste, C) on le laisse au jugement du modèle, D) autre chose, précise-moi. Chaque terme s'enregistre avec l'outil `terme`. B1 (juste ou faux) et B2 (confiance) ne se fixent qu'une fois, sur la couche racine (les sorties), expliqués par un exemple chiffré, avec `registre` (b1.couche1, b2.couche1) statut « propose » ; jamais de seuil pour une sous-couche, elles servent à définir, pas à noter. Avant la confirmation finale, présente l'arbre complet en page HTML publiée avec l'outil Artifact, construite sur le gabarit validé par l'utilisateur (`programme/gabarits/arbre-definitions.html` du dossier du module) : même style et même organigramme, seul le contenu change ; donne le lien, puis demande la confirmation en A/B/C. On s'arrête quand l'utilisateur dit que la définition lui convient."
+        },
+        {
+          "id": "E1.6",
+          "titre": "Les définitions au propre et la notation",
+          "qui": "agent",
+          "entree": "Le cadrage et l'arbre des définitions validé (plus l'outil compris, le cas échéant).",
+          "sortie": [
+            "etape1/definitions.md",
+            "etape1/fiche-notation.md",
+            "etape1/notation.py",
+            "etape1/test_notation.py",
+            "etape1/exemples-definitions.json"
+          ],
+          "consigne": "Un agent en arrière-plan écrit au propre, sans rien décider de nouveau : chaque critère en une phrase ; ce que le code peut calculer aussi en règle logique, le reste en phrase avec exemples ; ce que le modèle sort séparé des seuils ; ce que le code vérifie séparé de ce qui est laissé au modèle. La notation : réponse valide, réponse juste, qualité à la fréquence réelle des sorties, B1 et B2 de la couche racine. Une seule fonction de notation en code, testée, dont l'empreinte est notée. Présente ensuite le tout : un résumé, les points interprétés, trois réponses notées à la main (une juste, une fausse, une invalide). Chaque version est gardée avec ce qui a changé et pourquoi."
+        },
+        {
+          "id": "E1.7",
+          "titre": "La relecture à l'aveugle",
+          "qui": "agent",
+          "entree": "Les définitions, la fiche et la fonction de notation, et un lot d'exemples écrit par un agent séparé.",
+          "sortie": [
+            "etape1/relecture/"
+          ],
+          "consigne": "Les exemples sont écrits par un agent séparé, qui n'a pas écrit les définitions, à partir du cadrage et de l'outil compris (et, pour un outil, des consignes réelles recueillies). Deux relecteurs neufs, chacun de son côté, appliquent les définitions aux mêmes exemples ; le programme compare (outil `relecture`) et calcule l'accord critère par critère. Montre les désaccords et propose comment préciser la définition. Deuxième passe avec deux nouveaux relecteurs au plus ; s'ils divergent encore, la décision revient à l'utilisateur en A/B/C."
+        },
+        {
+          "id": "E1.8",
+          "titre": "Le scellement de l'étape 1",
+          "qui": "moi",
+          "entree": "Tout ce que l'étape 1 a produit, relecture passée.",
+          "sortie": [
+            "etape1/scelle.json"
+          ],
+          "consigne": "Présente le récapitulatif : chaque décision avec les mots de l'utilisateur et l'empreinte de chaque document scellé ; les seuils de qualité marqués « proposés, scellés à l'étape 2 ». Demande le scellement avec l'outil `sceller` ; il se confirme par le canal de confirmation de l'utilisateur (hors de portée des agents), jamais dans le chat."
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "titre": "L'étude des données",
+      "resume": "Décider quelle donnée, comment l'obtenir, combien en fabriquer pour chaque lot, avec quels seuils et pour quel coût, puis le faire vérifier par un agent neuf et le sceller.",
+      "tu_decides": "La donnée et la voie, la barre, le niveau visé, la façon de calculer, les cas rares, l'erreur acceptée sur les étiquettes, les réglages payants, puis le scellement.",
+      "sous_etapes": [
+        {
+          "id": "E2.1",
+          "titre": "Le type de donnée",
+          "qui": "moi",
+          "entree": "L'étape 1 scellée.",
+          "sortie": [
+            "etape2/donnee.md"
+          ],
+          "consigne": "Présente le format d'une donnée sur le gabarit validé par l'utilisateur (`programme/gabarits/format-donnee.md` du module) : UNE donnée concrète du chantier, en tableau « morceau · exemple » (profil de fabrication, but, chaque morceau de l'entrée, état de départ, bonne réponse, état attendu, jumeau, étiquettes), puis « Ce format te convient ? » en A/B/C. Discute ensuite chaque morceau dont l'utilité n'est pas évidente, un par message, avec un petit tableau d'exemples ; pour chacun, ce qui le rend réaliste et varié. L'utilisateur corrige jusqu'à ce que ça lui convienne."
+        },
+        {
+          "id": "E2.2",
+          "titre": "Récolter ou générer",
+          "qui": "moi",
+          "entree": "La donnée décrite et l'étape 1 scellée.",
+          "sortie": [
+            "etape2/voie.md"
+          ],
+          "consigne": "Présente les voies côte à côte (récolter, générer, mêler) : ce que chacune donne, ses risques, son ordre de coût et de durée, ta recommandation et pourquoi. Vraie discussion, aussi longue qu'il faut ; s'il te manque une information, va la chercher et reviens avec. Enregistre la voie choisie au registre (outil `registre`, clé voie.donnees : collecte, generation ou mixte) : elle décide si la stratégie de génération (E2.2.1) s'ouvre."
+        },
+        {
+          "id": "E2.2.1",
+          "titre": "La stratégie de génération",
+          "qui": "moi",
+          "voies": [
+            "generation",
+            "mixte"
+          ],
+          "entree": "La donnée décrite, la voie choisie et l'étape 1 scellée (arbre des définitions, sorties, cas rares).",
+          "sortie": [
+            "etape2/strategie-generation.md"
+          ],
+          "consigne": "Seulement si la voie génère tout ou partie des données. Générique, quel que soit le chantier : six questions, une par message, chacune en petit tableau avec un exemple tiré du chantier. 1) Les axes de variation : le contenu (tiré de l'arbre des définitions : sorties, définitions, cas rares), la forme (qui écrit, par quel canal, quel style, quel bruit) et le contexte (ce qui précède la donnée). 2) La couverture : un plan de quotas par case (croisement des axes) ; le générateur reçoit la case à remplir, jamais une phrase d'exemple à imiter (sinon il la recopie). Enregistre le plan au registre (clé generation.plan : {case: quota}). 3) Qui fixe la bonne réponse : de préférence un programme ou l'outil réel, jamais celui qui a écrit la donnée. 4) Les vraies données, même peu nombreuses : elles servent de graines de style et forment une part du test ; s'il n'y en a aucune, dis-le et note le risque. 5) La mesure de la diversité : doublons, quasi-doublons, couverture du plan, écart aux vraies données (les noms propres du cas réel, qu'aucune donnée inventée ne peut contenir, s'excluent par le registre generation.mots_exclus : liste de mots) ; seuils de methode.json (generation.seuils), à confirmer ou changer au registre. 6) L'essai face au réel : avant le volume, un petit modèle entraîné sur un petit lot généré, essayé sur les vraies données ; l'écart dit si le monde généré tient. Le test du banc est écrit par d'autres générateurs (autres modèles, autres profils) que l'entraînement. Écris le tout dans etape2/strategie-generation.md, avec les décisions de l'utilisateur mot pour mot."
+        },
+        {
+          "id": "E2.3",
+          "titre": "Le pilote",
+          "qui": "agent",
+          "entree": "La donnée et la voie.",
+          "sortie": [
+            "etape2/pilote/"
+          ],
+          "consigne": "Image : l'imprimeur qui sort quelques exemplaires avant d'en imprimer des milliers. Propose la taille du pilote avec sa raison et son coût ; accord avant toute dépense (outil `depense`). Le pilote tourne en arrière-plan avec la même chaîne que le volume. Présente ce qui a été mesuré, des exemples réussis et ratés. Les mesures du pilote s'écrivent dans etape2/pilote/mesures.json : {\"unites\", \"sorties\": {sortie: compte}, \"verite\": {\"relues\", \"erreurs\"}, \"voie\": \"generation\"|\"collecte\", \"inventaire\" (récolte seulement)}. Si la voie génère (E2.2.1) : mesure la diversité du pilote avec l'outil `diversite` (graines = les vraies données s'il y en a) et présente-la en tableau ; fais l'essai face au réel prévu en E2.2.1 ; un lot qui ne passe pas les seuils revient à la stratégie avant tout volume."
+        },
+        {
+          "id": "E2.4",
+          "titre": "Les lots",
+          "qui": "moi",
+          "notion": true,
+          "entree": "La voie et la donnée.",
+          "sortie": [
+            "etape2/lots.md"
+          ],
+          "consigne": "Image d'école, un lot à la fois : rétroaction (le cours), sélection (contrôle caché), pré-évaluation (examen blanc), examen, vérification. Pourquoi ils ne se mélangent jamais ; qui voit quoi. Pas encore de quantités."
+        },
+        {
+          "id": "E2.5",
+          "titre": "La barre",
+          "qui": "moi",
+          "notion": true,
+          "entree": "Les seuils proposés à l'étape 1 et les lots.",
+          "sortie": [
+            "registre"
+          ],
+          "consigne": "Image : la note minimale du permis. Pourquoi la note à l'examen n'est pas le niveau réel (exemple chiffré). Reprends les seuils proposés un par un ; confirme ou ajuste chacun en A/B/C. Ils restent « proposés ». Une barre et un niveau visé PAR SORTIE (registre barre.par_sortie, niveau_vise.par_sortie) et le plafond d'exécution à tort à part (plafond.executer_a_tort : barre, visé, strates) : le programme pose une porte par critère, jamais sur le mélange des sorties."
+        },
+        {
+          "id": "E2.6",
+          "titre": "Le niveau visé",
+          "qui": "moi",
+          "notion": true,
+          "entree": "La barre.",
+          "sortie": [
+            "registre"
+          ],
+          "consigne": "Image du basketteur (9 sur 10 vs 8 sur 10). Les deux sens du compromis, sans quantité encore. Propose un niveau visé avec sa raison, en A/B/C."
+        },
+        {
+          "id": "E2.7",
+          "titre": "Le gain utile",
+          "qui": "moi",
+          "notion": true,
+          "entree": "La barre, le niveau visé, la voie.",
+          "sortie": [
+            "etape2/gain-utile.md"
+          ],
+          "consigne": "L'écart entre la barre et le niveau visé fait la quantité de données. Petit tableau en ordre de grandeur (3-4 niveaux visés), à partir des mesures du pilote."
+        },
+        {
+          "id": "E2.8",
+          "titre": "Les portes",
+          "qui": "moi",
+          "notion": true,
+          "entree": "La barre, le niveau visé, le gain utile, les lots.",
+          "sortie": [
+            "etape2/portes.md"
+          ],
+          "consigne": "Trois guichets successifs ; pourquoi leurs seuils sont plus hauts que la barre ; ils sont calculés par le programme, rien à régler, seulement à comprendre."
+        },
+        {
+          "id": "E2.9",
+          "titre": "La chance d'être reçu",
+          "qui": "moi",
+          "notion": true,
+          "entree": "Le registre et les portes.",
+          "sortie": [
+            "etape2/chance-recu.md"
+          ],
+          "consigne": "La courbe « vrai niveau → chance de passer », quelques points lus en clair. Possibilité de revenir au niveau visé."
+        },
+        {
+          "id": "E2.10",
+          "titre": "Prudent ou au plus juste",
+          "qui": "moi",
+          "notion": true,
+          "entree": "Le registre, les portes, la courbe.",
+          "sortie": [
+            "etape2/calcul-prudent-juste.md"
+          ],
+          "consigne": "D'abord le tableau des chiffres du programme (outil `calcul`, champ tableaux.facons, recopié tel quel : il est écrit depuis comparaison_facons, aucun chiffre ne vient de toi), avant toute explication : une colonne par façon ; une ligne par porte (chaque critère : justesse de chaque sortie, plafond, B1), sur l'examen et la vérification réunis — seuil « au plus N ratés sur M », livrer à la barre, refuser par malchance au niveau visé — puis données au total et chance de franchir toutes les portes au niveau visé. Puis l'image de la randonnée, en deux lignes. Recommande prudent par défaut, en A/B/C."
+        },
+        {
+          "id": "E2.11",
+          "titre": "La sortie rare",
+          "qui": "moi",
+          "notion": true,
+          "entree": "Les sorties et leur fréquence, la donnée, la façon de calculer.",
+          "sortie": [
+            "etape2/cas-rares.md"
+          ],
+          "consigne": "Image du médecin et de la maladie rare. Les cas rares à deux niveaux (sortie, cas dans une sortie) et pour chaque définition de l'arbre. A) sur-représenter (recommandé), B) minimum par cas, C) fréquence réelle, D) autre chose, précise-moi."
+        },
+        {
+          "id": "E2.12",
+          "titre": "La fiabilité des étiquettes",
+          "qui": "moi",
+          "notion": true,
+          "entree": "La barre, le niveau visé, la voie, les cas rares.",
+          "sortie": [
+            "etape2/fiabilite-etiquettes.md"
+          ],
+          "consigne": "Image du corrigé avec des fautes. Tolérance d'erreur (≈ 3 ÷ tolérance données relues sans erreur) ; ce que le pilote a mesuré ; la part que l'utilisateur vérifiera lui-même et le temps que ça prend."
+        },
+        {
+          "id": "E2.13",
+          "titre": "Le coût",
+          "qui": "moi",
+          "notion": true,
+          "entree": "Tous les choix de l'étape 2 et la voie.",
+          "sortie": [
+            "etape2/devis.md"
+          ],
+          "consigne": "Le devis passe par passe (générer, étiqueter, relire, arbitrer) : fournisseur et modèle, réflexion, relectures par donnée, coût unitaire mesuré, coût total estimé, durée, part du quota de la semaine ; ce que chaque choix pèse. Validation passe par passe (outil `depense`)."
+        },
+        {
+          "id": "E2.14",
+          "titre": "Le calcul des quantités",
+          "qui": "programme",
+          "entree": "Le registre de l'étape 2 et les mesures du pilote.",
+          "sortie": [
+            "etape2/calcul/"
+          ],
+          "consigne": "Lance le calcul avec l'outil `calcul` (le programme calcule, jamais toi) : il lit le registre (barre.par_sortie, niveau_vise.par_sortie, plafond.executer_a_tort, repli barre.qualite / niveau_vise.qualite ; calcul.facon, calcul.toutes_portes_au_vise, cas_rares.regle, etiquettes.tolerance, b1.couche1, lots.entrainement_min) et etape2/pilote/mesures.json ; pour la chance d'un modèle donné, passe-lui `profils` (jamais ton propre calcul). L'entraînement ne se déduit pas de la sélection quand le registre donne lots.entrainement_min : le cours, hors sélection, vaut au moins cette valeur, à parts égales entre sorties, et la sélection garde la taille que ses critères demandent. Le plafond d'exécution à tort reçoit la borne des corrigés comme les justesses. Présente le résultat en clair avec les tableaux du champ tableaux (tailles, seuils, profils), recopiés tels quels, lot par lot et sortie par sortie, porte par porte, avec ce que chaque nombre veut dire (« à l'examen, le modèle peut rater au plus N données sur M ») et quelle définition fixe la quantité ; montre les écarts avec l'ordre de grandeur annoncé. Un motif de compromis : propose un compromis chiffré en A/B/C. Les écarts au registre (champ ecarts_registre) se corrigent au registre. Un pilote trop petit pour la tolérance des étiquettes n'est pas un compromis : les portes se posent avec la borne prévue (etiquettes.tolerance) et le champ a_confirmer dit « à confirmer par N relectures à l'étape 3 » ; dis-le en clair (borne mesurée, borne prévue, N). Registre etiquettes.plan_par_sortie à true : le plan de fiabilité compte N relectures PAR SORTIE dans le test seulement (N × sorties en tout), chaque sortie confirmée sur sa propre borne, et les inversions vers EXÉCUTER se comptent sur les corrigés EXÉCUTER du test ; dis-le aussi. Inscris ensuite les quantités et les seuils des portes au registre (« propose »)."
+        },
+        {
+          "id": "E2.15",
+          "titre": "La vérification indépendante",
+          "qui": "agent",
+          "entree": "Tout ce que l'étape 2 a produit et l'étape 1 scellée.",
+          "sortie": [
+            "etape2/verification.md"
+          ],
+          "consigne": "Un agent neuf audite toute l'étape avec ses propres scripts ; rapport en points mineurs (correction proposée) et majeurs (sous-étape à rouvrir). Tant qu'un problème majeur n'est ni corrigé ni écarté, la validation reste fermée. Le rapport s'écrit dans etape2/verification.md, et ses points dans etape2/verification.json : {\"points\": [{\"id\", \"niveau\": \"mineur\"|\"majeur\", \"resume\", \"sous_etape\", \"decision\": null|\"corrige\"|\"ecarte\"|\"refuse\"}]} ; la décision de l'utilisateur sur chaque point s'y inscrit. L'audit relit aussi la stratégie de génération (E2.2.1) : axes oubliés, phrases d'exemple données au générateur, bonne réponse fixée par celui qui écrit, test écrit par les mêmes générateurs que l'entraînement."
+        },
+        {
+          "id": "E2.16",
+          "titre": "La validation de l'étape 2",
+          "qui": "moi",
+          "entree": "Toute l'étape 2 et la vérification sans problème majeur ouvert.",
+          "sortie": [
+            "etape2/scelle.json"
+          ],
+          "consigne": "Récapitulatif d'un seul tenant ; ce que la validation verrouille (les seuils « proposés » deviennent scellés). Scellement par l'outil `sceller`, confirmé sur le téléphone."
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "titre": "Le banc",
+      "resume": "Fabriquer, sans toi, un banc complet, étiqueté et vérifié selon le plan scellé ; tu peux le relire, puis tu le scelles.",
+      "tu_decides": "La part que tu relis toi-même, puis le scellement.",
+      "sous_etapes": [
+        {
+          "id": "E3.1",
+          "titre": "La fabrication autonome du banc",
+          "qui": "programme",
+          "entree": "Le plan scellé de l'étape 2.",
+          "sortie": [
+            "etape3/banc/",
+            "etape3/bilan.md"
+          ],
+          "consigne": "La chaîne tourne sans l'utilisateur ; ne l'interromps que si le plan ne peut pas être suivi (dépassement du devis, trop de données jetées, quantité inatteignable, consigne d'étiquetage qui ne converge pas). Greffe G6 : tout dossier remis à un agent chercheur passe d'abord par l'outil `verifier_contexte` (par le nom et par le contenu) ; s'il signale une fuite, rien n'est remis et tu le dis à l'utilisateur. Si la voie génère : le volume se contrôle par lot avec l'outil `diversite` contre les seuils scellés et le plan de quotas ; un lot sous les seuils est refait, pas gardé."
+        },
+        {
+          "id": "E3.2",
+          "titre": "Ta vérification du banc (facultative)",
+          "qui": "moi",
+          "entree": "Le banc, son bilan et la part à vérifier choisie en E2.12.",
+          "sortie": [
+            "etape3/relecture-utilisateur.md"
+          ],
+          "consigne": "Rappelle la part choisie et le temps que ça prend ; la relecture se fait dans le volet. Pour les lots scellés, tu ne vois que des comptes. Si le calcul scellé est « à confirmer » (étiquettes), les relectures du plan ne sont pas facultatives : après elles, l'outil `confirmer_portes` relance le calcul avec la borne mesurée ; les portes se figent, ou l'écart ferme la fabrication jusqu'à la réouverture de l'étape 2 (dis-le à l'utilisateur, sans rien décider pour lui). Plan par sortie : les relectures se tirent dans le test, par sortie, au fil de la fabrication, et l'écart d'une seule sortie ferme la fabrication."
+        },
+        {
+          "id": "E3.3",
+          "titre": "Le scellement du banc",
+          "qui": "moi",
+          "entree": "Le banc, son bilan et la relecture.",
+          "sortie": [
+            "etape3/scelle.json"
+          ],
+          "consigne": "Récapitulatif (lots, tailles, répartition, accord, relecture, coût réel face au devis, portes figées sur la borne mesurée) ; scellement par l'outil `sceller`, confirmé par le canal de confirmation (refusé tant que des portes « à confirmer » ne sont pas figées)."
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "titre": "La boucle",
+      "resume": "L'entraînement et l'évaluation bouclent entre eux : la boucle cherche seule de meilleurs harnais ; tu sors un champion prêt et autorises son examen.",
+      "tu_decides": "Les seuils d'entrée en pré-évaluation, la patience K, le lancement, les sollicitations, la sortie d'un champion et l'autorisation d'examen.",
+      "sous_etapes": [
+        {
+          "id": "E4.1",
+          "titre": "Le départ",
+          "qui": "moi",
+          "entree": "Le banc scellé et le registre.",
+          "sortie": [
+            "etape4/depart.md",
+            "etape4/depart.json"
+          ],
+          "consigne": "Image du coureur chronométré avant l'entraînement. Présente l'examen à vide et le diagnostic ; fais fixer les seuils de la porte 1 et K ; présente la consommation (accord, outil `depense`) ; puis lancement. Greffe G5 : la dépense de chaque lignée (sessions d'agents, mesures, appels au petit modèle) est tenue dans un registre que le programme contrôle ; présente-la avec la consommation, et pour toute comparaison de deux façons de chercher, fais fixer le même plafond aux deux. Greffe G2 : présente aussi ce que la bibliothèque apporte au départ (outil `bibliotheque`) : leçons établies sur ce chantier, leçons d'autres chantiers à revérifier sur ce banc, harnais gardés ; jamais une piste non prouvée présentée comme un fait. Greffe G1, geste OBLIGATOIRE au démarrage : avant l'entraînement long, la boucle teste les deux façons de chercher — deux chercheurs ciblés (méthode du harnais, savoir du métier) puis un compositeur, contre un chercheur seul — à budget égal, tout le reste identique (même banc, même départ, même bibliothèque), et on garde la gagnante (E4.2). Fais fixer à l'utilisateur le plafond de mesures commun aux deux lignées (point p01, outil `decision`, et `registre`, clé test_ab.plafond_mesures) ; présente ce que coûte chaque façon (la ciblée lance environ trois fois plus de sessions de recherche). Question propre au chantier, que tu POSES et ne tranches jamais : avant la première porte, demande quelles sorties comptent comme « prudentes » pour le contrôle A3 (une sortie prudente qui gagne pendant qu'une sortie d'action perd ferme la porte : c'est le biais vers le refus). Une question, en A/B/C avec un exemple concret pris dans les sorties scellées du chantier — par exemple, pour un agent qui pilote un logiciel : A — seulement « faire répéter » ; B — « faire répéter » et « ne rien faire » ; C — aucune sortie n'est prudente ici ; D — autre chose, précise-moi. Enregistre sa réponse avec `decision` (point p02) et `registre` (clé audit_porte.sorties_prudentes). E4.1 ne se valide pas tant que p01 et p02 ne sont pas tranchés.",
+          "points": [
+            {
+              "id": "p01",
+              "titre": "Le plafond commun du test des deux façons de chercher (G1)"
+            },
+            {
+              "id": "p02",
+              "titre": "Les sorties prudentes du contrôle A3 (G8)"
+            }
+          ],
+          "points_avant_validation": true
+        },
+        {
+          "id": "E4.2",
+          "titre": "L'entraînement tourne seul",
+          "qui": "programme",
+          "entree": "Le départ, les seuils, K, le banc, l'arbre.",
+          "sortie": [
+            "etape4/",
+            "etape4/test-ab.json"
+          ],
+          "consigne": "La boucle tourne seule ; dans le chat, réponds « où en est la boucle » avec les verdicts seulement, jamais les chiffres du tas caché. Greffe G3 : chaque essai porte sa table d'attribution, une ligne par modification (aide, nui, sans effet ou confondu), décidée par le programme sur un test apparié ; deux modifications qu'aucune mesure n'isole sont toujours « confondu ». Quand l'utilisateur demande pourquoi un essai a gagné ou perdu, lis-lui cette table, jamais une attribution devinée. Greffe G4 : un essai n'occupe une machine qu'après la validation mécanique du programme ; s'il est refusé, un seul rattrapage, puis il est écarté et compté (jamais mesuré). Greffe G6 : tout dossier remis à un agent chercheur passe d'abord par l'outil `verifier_contexte` (par le nom et par le contenu) ; s'il signale une fuite, rien n'est remis et tu le dis à l'utilisateur. Greffe G1 : chaque essai développé par la boucle vient de deux chercheurs ciblés (méthode du harnais, savoir du métier) qui lisent les mêmes traces, puis d'un compositeur ; c'est ce que montrent les dimensions de la table d'attribution. Greffe G1, test des deux façons — PREMIER geste de l'entraînement : deux lignées tournent au plafond commun fixé en E4.1, « ciblee » (deux chercheurs + compositeur) et « generique » (un chercheur seul), tout le reste identique ; leurs registres de budget doivent être comparables (`registre-budget.py comparer` : « EGAL »). Au plafond, le programme compare le meilleur score de sélection des deux lignées par un test apparié, au risque de la méthode ; la gagnante devient le réglage `niveau1.recherche` du chantier pour toute la suite. Si le test ne tranche pas, c'est une sollicitation (E4.3) : présente les deux résultats et leurs coûts, l'utilisateur choisit. Le résultat (lignées, plafond, dépense de chacune, scores, test, gagnante) est dans etape4/test-ab.json ; E4.2 ne se valide pas sans lui. Dis à l'utilisateur, en clair, laquelle a gagné et ce qu'elle coûte.",
+          "requis_avant_validation": [
+            "etape4/test-ab.json"
+          ]
+        },
+        {
+          "id": "E4.3",
+          "titre": "Les sollicitations",
+          "qui": "moi",
+          "entree": "L'état de la boucle.",
+          "sortie": [
+            "journal"
+          ],
+          "consigne": "Seulement : plateau sous la porte 1, tas caché trop petit, quota, garde-fou, proposition d'un agent. Bilan simple et choix en A/B/C ; les décisions qui engagent se confirment sur le téléphone."
+        },
+        {
+          "id": "E4.4",
+          "titre": "Le champion prêt (pré-évaluation)",
+          "qui": "programme",
+          "entree": "Le champion qui franchit la porte 1.",
+          "sortie": [
+            "journal"
+          ],
+          "consigne": "Les agents ne reçoivent que « prêt » ou « pas prêt » ; le score n'est visible que de l'utilisateur. Greffe G8 : avant cette porte, passe la liste d'audit des échecs connus (outil `audit_porte`, un verdict et une preuve par point) ; un seul « échec » ferme la porte, et tu dis à l'utilisateur lequel, en clair (A3 = le biais vers le refus : les sorties prudentes montent pendant que les sorties d'action baissent)."
+        },
+        {
+          "id": "E4.5",
+          "titre": "Sortir un champion",
+          "qui": "moi",
+          "entree": "Le champion prêt.",
+          "sortie": [
+            "etape4/versions/"
+          ],
+          "consigne": "Version figée, essai à blanc dans les conditions du livrable ; l'autorisation d'examen se confirme par le canal de confirmation, liée à l'empreinte. Greffe G8 : avant cette porte, passe la liste d'audit des échecs connus (outil `audit_porte`, un verdict et une preuve par point) ; un seul « échec » ferme la porte, et tu dis à l'utilisateur lequel, en clair (A3 = le biais vers le refus : les sorties prudentes montent pendant que les sorties d'action baissent)."
+        },
+        {
+          "id": "E4.6",
+          "titre": "L'examen et la décision",
+          "qui": "programme",
+          "entree": "La version figée et l'autorisation.",
+          "sortie": [
+            "journal"
+          ],
+          "consigne": "Présente le verdict en clair : réussi ou non, sur quel critère, avec l'apport de la boucle face au modèle brut. Greffe G8 : avant cette porte, passe la liste d'audit des échecs connus (outil `audit_porte`, un verdict et une preuve par point) ; un seul « échec » ferme la porte, et tu dis à l'utilisateur lequel, en clair (A3 = le biais vers le refus : les sorties prudentes montent pendant que les sorties d'action baissent). Fin de l'entraînement = nettoyage de toutes les machines qui ont servi (serveur, postes de calcul, ordinateur de l'opérateur), pour que rien ne s'accumule, en gardant la structure prête à resservir. On garde : le champion figé, une seule version précédente du code, les preuves et journaux de l'examen, et la structure prête à resservir (environnements, outils, dossiers vides). On supprime : sorties intermédiaires des essais, harnais non retenus, copies de banc, caches retéléchargeables (pip, uv, huggingface), versions de code plus anciennes que la précédente, sauvegardes de travail. Liste par machine (chemin, taille, dernier usage) présentée à l'utilisateur en A/B/C avant toute suppression ; sur WSL, donner ensuite la commande de compactage du disque virtuel. Pas de calcul lourd sur une machine partagée."
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "titre": "Le livrable",
+      "resume": "Emballer la version qui a réussi l'examen pour le client : cadrage, construction avec le même moteur, équivalence, mesure, recette signée.",
+      "tu_decides": "Le cadrage du livrable et ses écrans, les écarts éventuels, puis la recette.",
+      "sous_etapes": [
+        {
+          "id": "E5.1",
+          "titre": "Le cadrage du livrable",
+          "qui": "moi",
+          "entree": "L'étape 1 scellée.",
+          "sortie": [
+            "etape5/cadrage.json",
+            "etape5/maquettes/"
+          ],
+          "consigne": "Comme le cadrage de l'étape 1 : forme, confinement, source des données, écrans (maquettes validées avant construction), appel, mise à jour, garanties visibles."
+        },
+        {
+          "id": "E5.2",
+          "titre": "La construction",
+          "qui": "agent",
+          "entree": "Le cadrage, les maquettes, la version figée.",
+          "sortie": [
+            "etape5/livrable/"
+          ],
+          "consigne": "Un seul moteur pour l'examen et le livrable ; agent chargé par étiquette ; écrans vérifiés sur captures par un agent neuf."
+        },
+        {
+          "id": "E5.3",
+          "titre": "L'équivalence",
+          "qui": "programme",
+          "entree": "Le livrable et la version examinée.",
+          "sortie": [
+            "etape5/equivalence.md"
+          ],
+          "consigne": "Mêmes décisions que la version examinée, sur des données du tas montré ; sinon l'agent n'entre pas au livrable."
+        },
+        {
+          "id": "E5.4",
+          "titre": "La mesure",
+          "qui": "programme",
+          "entree": "Le livrable équivalent.",
+          "sortie": [
+            "etape5/mesure.md"
+          ],
+          "consigne": "Taille installée et vitesse face aux limites de l'étape 1."
+        },
+        {
+          "id": "E5.5",
+          "titre": "La recette",
+          "qui": "moi",
+          "entree": "La version réussie, le livrable équivalent et mesuré.",
+          "sortie": [
+            "etape5/recette/"
+          ],
+          "consigne": "Version livrée et ses trois mesures, rapport de recette pour le client ; signature par le canal de confirmation ; tout envoi au client passe par l'utilisateur."
+        },
+        {
+          "id": "E5.6",
+          "titre": "La boucle d'usage (future, après déploiement)",
+          "qui": "agent",
+          "entree": "Plus tard, quand une version déployée aura ses journaux de production (consignes envoyées et réponses) ; format : programme/usage-interface.md.",
+          "sortie": [
+            "etape5/usage/branchement.md",
+            "etape5/usage/propositions.jsonl"
+          ],
+          "consigne": "FUTURE — pas un geste de livraison. Cette sous-étape ne s'ouvre pas, ne se valide pas et ne bloque ni la recette ni le scellement de l'étape 5 ; ne demande au livrable aucune interface de journal maintenant. Elle décrit ce qui se fera après un déploiement, à partir des journaux de production : greffe G7 — import par `usage_importer` (le programme scelle une part tirée au hasard avant que quiconque la voie), sonde par un agent frais sur la seule part visible (etape5/usage/sonde.jsonl), chaque proposition rejouée à l'étape 4 et retenue seulement si `usage_juger` dit « adoptee » (pas de recul sur le banc ET gain significatif sur la part réelle scellée, étiquetée après coup par un agent séparé : `usage_a_etiqueter`, `usage_etiqueter`). La taille de la part réelle scellée ne se décide pas maintenant : le jour venu, pose la question à l'utilisateur (A/B/C avec exemple), ne la tranche pas. Tu ne lis jamais la part scellée ; tu ne montres que des comptes et des verdicts.",
+          "future": true
+        }
+      ]
+    }
+  ]
+}

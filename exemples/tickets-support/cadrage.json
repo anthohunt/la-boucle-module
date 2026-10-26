@@ -1,0 +1,15 @@
+{
+  "_role": "Example answers of the operator, as the module records them (decision tool): the words are kept as they were written.",
+  "decisions": [
+    {"sous_etape": "E1.2", "resume": "The need is a three-way triage of support tickets", "citation": "yes, that is exactly it", "option": "A"},
+    {"sous_etape": "E1.4", "point": "p01", "resume": "One decision per ticket, never several", "citation": "one decision per ticket"}
+  ],
+  "arbre": [
+    {"id": "N1", "libelle": "decision on the ticket", "etat": "redecoupe", "citation": "let us split it"},
+    {"id": "N2A", "libelle": "is a customer blocked right now", "parent": "N1", "etat": "liste", "liste": ["yes", "no"], "citation": "a closed list is enough"},
+    {"id": "N2B", "libelle": "is the message only a thank-you or a newsletter", "parent": "N1", "etat": "modele", "citation": "leave it to the model"}
+  ],
+  "registre": [
+    {"cle": "b1.couche1", "valeur": 0.9, "libelle": "right-or-wrong threshold of the root layer", "citation": "90 percent"}
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "_role": "Catégories de besoin connues du mode (E1.3) et les sous-étapes que chacune ajoute au parcours. On en ajoute une quand un besoin revient souvent.",
+  "categories": [
+    {
+      "id": "classique",
+      "titre": "Besoin classique",
+      "description": "Le modèle lit une entrée et rend une décision fermée (ex. tickets de support : un ticket → urgent, à vérifier, rien).",
+      "ajoute": []
+    },
+    {
+      "id": "agent-interaction-logicielle",
+      "titre": "Agent d'interaction logicielle",
+      "description": "Le modèle pilote un outil logiciel à partir de consignes de l'utilisateur (ex. une appli de tâches : une consigne → une action de l'appli).",
+      "ajoute": ["E1.3.1"]
+    }
+  ]
+}

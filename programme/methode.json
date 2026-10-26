@@ -1,0 +1,158 @@
+{
+  "_role": "Règles de méthode du calcul de l'étape 2 (recette binomiale exacte de la boucle), valeurs par défaut de tout chantier. Un chantier les change par son registre (clé calcul.<nom>), décision de l'utilisateur citée. Valeurs par défaut : risque 0,05, puissance 0,8 (par test), fraction de sélection 0,2, 5 consultations de l'examen blanc, 2 tentatives d'examen (clé de registre calcul.tentatives_examen). Risque par lot : sélection risque, examen blanc risque/consultations, examen et vérification risque/tentatives chacun (les deux exigés, chaque critère exigé : test d'intersection-union). Les barres, niveaux visés et le plafond viennent du registre (barre.par_sortie, niveau_vise.par_sortie, plafond.executer_a_tort ; repli barre.qualite, niveau_vise.qualite) ; calcul.toutes_portes_au_vise (vrai) fait les tailles pour qu'un modèle au niveau visé de chaque critère franchisse toutes les portes avec la puissance. calcul.portes_filtres (vrai) fait des portes 1 et 2 des filtres au seuil de la porte 3 (même fraction) : la livraison seule garantit, un modèle au niveau visé y est livré avec la puissance (partagée entre ses tests) ; la sélection et l'examen blanc sont dimensionnés pour qu'un modèle au niveau visé franchisse chaque filtre avec la chance filtre_chance_vise (0,9) et qu'un modèle à la barre d'un critère n'en franchisse le test qu'avec au plus filtre_chance_barre (0,5) ; les deux ne servent qu'à cette option. Sous « greffes_h2 » : les règles des greffes inspirées de Harness² (Google Research, arXiv:2610.14224) ; elles n'entrent pas dans le calcul de l'étape 2.",
+  "risque": 0.05,
+  "puissance": 0.8,
+  "selection_fraction": 0.2,
+  "consultations": 5,
+  "tentatives_examen": 2,
+  "fenetre_n": 3,
+  "minimum_essais": 3,
+  "filtre_chance_vise": 0.9,
+  "filtre_chance_barre": 0.5,
+  "greffes_h2": {
+    "decision": {
+      "reference": "Harness² (Google Research), arXiv:2610.14224 : liste des échecs connus d'une optimisation de harnais, et boucle de recherche à deux niveaux"
+    },
+    "g4_validation": {
+      "regle": "Avant toute mesure, le programme valide mécaniquement le harnais (lisible, bon parent, compile, modules permis, aucun verdict du juge) ; un seul rattrapage ; au second refus l'essai est écarté et compté, sans occuper de machine.",
+      "rattrapages": 1,
+      "controle_de_forme_par_le_juge": false
+    },
+    "g5_budget": {
+      "regle": "Chaque lignée de recherche tient un registre de sa dépense (sessions d'agents de recherche et de réflexion, mesures, appels au petit modèle), une étiquette unique par dépense ; le programme refuse une étiquette en double et un registre ouvert par une autre configuration ; deux lignées comparées (test A/B, témoins) ont le même plafond, vérifié par le programme.",
+      "fichiers": "etape4/registre-budget-<lignee>.jsonl"
+    },
+    "g6_garde": {
+      "regle": "Aucun verdict du juge (examen, sélection, pré-évaluation, vérification, recorrection) dans un dossier ou une consigne remis à un agent chercheur, vérifié par le nom ET par le contenu ; une fuite arrête la remise (c'est une fuite à corriger, pas un marqueur à élargir). Mode « aucun » (défaut) : aucun agent ne voit l'examen, même agrégé par catégorie ; mode « agreges » (seulement si le chantier le demande expressément) : les notes d'examen agrégées par catégorie.",
+      "mode_defaut": "aucun",
+      "cles_toujours": [
+        "vs_parent",
+        "p_signe",
+        "gagnes",
+        "perdus",
+        "recorrection",
+        "verification",
+        "triche",
+        "pre_evaluation",
+        "preevaluation",
+        "score_selection",
+        "note_selection",
+        "selection_score"
+      ],
+      "cles_examen": [
+        "examen",
+        "examen_vec",
+        "delta_par_cat",
+        "note_examen"
+      ],
+      "noms": [
+        "^(exa|rec|ver)-.*\\.json$",
+        "pre-?evaluation",
+        "(^|/)verification",
+        "(^|/)examen",
+        "recorrection",
+        "selection"
+      ],
+      "textes": [
+        "VERIFICATION \\(lot",
+        "RECORRECTION de",
+        "pts, \\d+ gagnes / \\d+ perdus"
+      ]
+    },
+    "g8_audit": {
+      "regle": "Avant chaque porte (1 : entraînement → pré-évaluation ; 2 : pré-évaluation → examen ; 3 : examen → livrable), la liste des échecs connus d'une optimisation de harnais (inspirée de Harness²) est passée point par point, chaque réponse avec sa preuve ; un seul « échec » ferme la porte. Le point A3 est le biais vers le refus.",
+      "source": "arXiv:2610.14224 (Harness², Google Research), liste des échecs connus",
+      "verdicts": [
+        "ok",
+        "echec",
+        "sans objet"
+      ],
+      "points": [
+        {
+          "id": "A1",
+          "groupe": "sélection",
+          "question": "Le choix a-t-il écarté un candidat déjà mesuré et meilleur sur la part qui juge ?"
+        },
+        {
+          "id": "A2",
+          "groupe": "sélection",
+          "question": "Un seul critère a-t-il décidé contre tous les autres ?"
+        },
+        {
+          "id": "A3",
+          "groupe": "sélection",
+          "question": "Le choix sacrifie-t-il la couverture à la prudence : les sorties prudentes (refus, faire répéter, à vérifier, vide) montent-elles pendant que les sorties d'action baissent ? C'est le biais vers le refus."
+        },
+        {
+          "id": "B1",
+          "groupe": "modification restrictive",
+          "question": "Une règle nouvelle bride-t-elle tous les candidats de la lignée (héritée par tous, et elle interdit peut-être la bonne réponse) ?"
+        },
+        {
+          "id": "B2",
+          "groupe": "modification restrictive",
+          "question": "La preuve qu'une modification marche vient-elle d'un contrôle écrit par son propre auteur, plutôt que du juge ou du programme ?"
+        },
+        {
+          "id": "B3",
+          "groupe": "modification restrictive",
+          "question": "Un a priori tiré de traces non notées est-il devenu une règle « toujours / jamais » sans mesure qui la justifie ?"
+        },
+        {
+          "id": "C1",
+          "groupe": "exécution et évaluation",
+          "question": "L'écart tient-il dans la variabilité (critère tout-ou-rien, peu de données) : faut-il répéter la mesure avant de conclure ?"
+        },
+        {
+          "id": "C2",
+          "groupe": "exécution et évaluation",
+          "question": "Des pannes, délais ou réponses illisibles ont-ils été comptés comme des fautes, ou l'inverse ?"
+        },
+        {
+          "id": "C3",
+          "groupe": "exécution et évaluation",
+          "question": "La modification porte-t-elle sur quelque chose que la note ne lit pas (effort sans effet sur les critères) ?"
+        }
+      ],
+      "a3_mecanique": {
+        "regle": "Le programme ferme aussi la porte si une sortie prudente gagne au moins seuil_points pendant qu'une sortie d'action en perd autant (notes par sortie du candidat contre la base).",
+        "seuil_points": 2,
+        "sorties_prudentes": "réglage du chantier (registre audit_porte.sorties_prudentes), POSÉ à l'utilisateur en E4.1 (point p02), avant la première porte, en A/B/C avec un exemple ; jamais tranché par l'agent"
+      }
+    },
+    "g2_bibliotheque": {
+      "regle": "Bibliothèque de harnais complets et EXPERIENCE.md (situation, leçon, preuve) entre chantiers, à la place du journal des gestes. Une leçon n'y entre que par le programme, sur une modification isolée dont le test apparié est significatif ; elle sort si une mesure la contredit ; une leçon venue d'un autre chantier est une hypothèse, revérifiée sur le banc du nouveau chantier avant d'être citée comme acquise. Rien d'une part cachée n'y entre.",
+      "risque": "celui de la méthode (risque)",
+      "racine": "réglage « bibliotheque » (boucle-module.json) ou $LA_BOUCLE_BIBLIOTHEQUE ; vide : pas de bibliothèque"
+    },
+    "g1_recherche": {
+      "regle": "Pour développer un essai, deux chercheurs ciblés lisent les mêmes traces : « méthode du harnais » (comment il travaille) et « savoir du métier » (ce qu'un praticien sait, en règles vérifiables, jamais un fait d'une donnée) ; chacun propose au plus une modification avec la trace qui la justifie ; un compositeur écrit l'essai avec ce que les traces justifient (les deux, une ou aucune). Deux modifications gardées ensemble sont « confondues » (G3).",
+      "defaut": "ciblee",
+      "interrupteur": "niveau1.recherche = ciblee | generique",
+      "test_ab": {
+        "etat": "on garde l'interrupteur ; le test se fait au démarrage de l'étape 4 (geste obligatoire, E4.1 et E4.2), et on garde la gagnante",
+        "protocole": "deux lignées au même plafond de mesures (G5, fixé par l'utilisateur en E4.1, point p01), tout le reste identique (banc, départ, bibliothèque) : « ciblee » (deux chercheurs ciblés + compositeur) contre « generique » (un chercheur seul) ; registres comparables (registre-budget.py comparer : EGAL) ; mesure : meilleur score de sélection de chaque lignée au plafond, test apparié au risque de la méthode ; la gagnante devient niveau1.recherche pour la suite ; un test qui ne tranche pas est une sollicitation (E4.3) : l'utilisateur choisit. Résultat : etape4/test-ab.json (E4.2 ne se valide pas sans lui).",
+        "cout_mesure": "à budget de mesures égal, la lignée ciblée dépense environ 3 fois plus de sessions de recherche (2 chercheurs + 1 compositeur par développement)"
+      }
+    },
+    "g7_usage": {
+      "statut": "future, après déploiement, à partir des journaux de production — pas un geste de livraison ; E5.6 ne s'ouvre pas et ne bloque rien ; aucune interface à faire écrire au livrable maintenant",
+      "regle": "Plus tard, quand une version déployée journalisera ses consignes et ses réponses en production : à l'arrivée, avant qu'aucun agent ne les voie, le programme en scelle une part tirée au hasard ; un agent de sonde lit le reste (décisions du petit modèle, contrastes) et propose des modifications ; chaque modification est jugée sur le banc (test apparié) ET sur la part réelle scellée, étiquetée après coup par un agent qui n'est ni la sonde ni un chercheur.",
+      "part_scellee": 0.5,
+      "scellee_min_defaut": 200,
+      "consultations_max": 5,
+      "interface": "programme/usage-interface.md",
+      "dossier": "etape5/usage/",
+      "taille_part_scellee": "pas à décider maintenant : le jour venu, posée à l'utilisateur ; scellee_min_defaut n'est qu'une valeur technique des outils"
+    }
+  },
+  "generation": {
+    "_role": "E2.2.1 : seuils de diversité d'un lot généré, par défaut ; un chantier les change par son registre (generation.seuils).",
+    "seuils": {
+      "part_distinctes_min": 0.9,
+      "quasi_doublon_jaccard": 0.8,
+      "quasi_doublons_max_pour_mille": 5,
+      "mots_reels_couverts_min": 0.8
+    }
+  }
+}
