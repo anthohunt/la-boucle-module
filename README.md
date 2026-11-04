@@ -58,7 +58,7 @@ claude --plugin-dir /path/to/la-boucle-module
 
 **B. Installed, through the marketplace file of this repository** (`.claude-plugin/marketplace.json`, marketplace `la-boucle`)
 ```bash
-claude plugin marketplace add /path/to/la-boucle-module      # or: anthohunt/la-boucle-module once published on GitHub
+claude plugin marketplace add /path/to/la-boucle-module      # or: anthohunt/la-boucle-module
 claude plugin install la-boucle-v2@la-boucle
 ```
 then run `/reload-plugins` in an open session. Once the repository is published, the one-step form also works: `/plugin install la-boucle-v2 --marketplace anthohunt/la-boucle-module`. The marketplace points at your clone: the module stops loading if you move or delete it.
