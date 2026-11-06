@@ -134,3 +134,7 @@ The two invented cases (`exemples/`): **(1)** a closed decision on fictional sup
 - Claude Code and its generated type declarations belong to Anthropic and are not redistributed.
 
 Copyright 2026 Anthony Hunt.
+
+---
+
+**Anthony Hunt** · [Project page on ingevision.cloud](https://ingevision.cloud/?lang=en&p=boucle) · [LinkedIn](https://www.linkedin.com/in/anthony-hunt-3948a9196) · [GitHub profile](https://github.com/anthohunt)
