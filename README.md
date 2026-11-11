@@ -20,7 +20,7 @@ An animated presentation walks through the whole method, step by step, on a real
 |---|---|
 | [![La Boucle, explained in English (15 min 54)](docs/images/video-en.jpg)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view) | [![La boucle, expliquée en français (15 min 52)](docs/images/video-fr.jpg)](https://drive.google.com/file/d/1TZXAxUeyCGkEj3yFR7hDBZXeerJQxmtA/view) |
 
-The video counts four steps: the module splits its second one into the data study and the bench, hence the five steps below. The screen captures of the software stay in French in both versions.
+The video counts four steps (objective, data, training, deliverable): the module splits training into the bench and the loop, hence the five steps below. The screen captures of the software stay in French in both versions.
 
 ## What the module does, in 5 steps
 
