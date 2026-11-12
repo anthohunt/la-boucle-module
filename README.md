@@ -1,9 +1,9 @@
 # la-boucle-module — "La boucle" v2 as a Claude Code mod
 
-> **EARLY ACCESS.** This module is written for the Claude Code *mods* API, whose type declarations say:
-> "EARLY ACCESS: this surface may change between releases without notice". It was developed and tested against
-> Claude Code 2.1.295; mods need Claude Code 2.1.287 or later. A new Claude Code release can break it. Check the
-> [official mods documentation](https://code.claude.com/docs/en/plugins/mods/overview.md) first.
+> **Requirements.** This module is a Claude Code *mod* (a plugin with a JavaScript/TypeScript hooks module). Mods are on by default
+> since Claude Code 2.1.287. The module was developed and tested against Claude Code 2.1.295 and passes `claude plugin validate`
+> on 2.1.319. A mod runs with your permissions: read [what this one does](#what-the-module-does-in-5-steps) and the
+> [official mods documentation](https://code.claude.com/docs/en/plugins/mods/overview.md) before installing it.
 
 The module drives one **worksite** (*chantier*) of the **La boucle** method from inside Claude Code (terminal, the Code tab of
 Claude Desktop, VS Code): a **control pane** on the side, a **band above the prompt**, instructions injected into the session
@@ -43,7 +43,6 @@ The module does not contain the engine; the command is a setting (`moteur`, defa
 ```bash
 pip install git+https://github.com/anthohunt/la-boucle-engine
 ```
-(The engine repository is not published yet when this README is written; until then, clone or copy it and put it on `PYTHONPATH`.)
 Note: the program of this module is itself called `programme/boucle.py`. Do not add the `programme/` folder to `PYTHONPATH`, or it would shadow the engine's `boucle` package.
 
 ## Requirements
@@ -135,6 +134,15 @@ The two invented cases (`exemples/`): **(1)** a closed decision on fictional sup
 | `types/index.d.ts` | the module's own contract |
 | `tests/`, `programme/tests/` | mod tests and program tests |
 | `docs/` | settings, and the history of version 1 |
+
+## Privacy
+
+The module collects no data for its author and sends nothing to a service run by its author. What it records (the worksite
+files: the objective, the operator's decisions word for word, the measures) stays in the worksite folder on your machine
+(`racine_chantiers`, default `~/.la-boucle/chantiers`), or on the SSH host you set yourself, until you delete it. Data leaves
+that folder only through what you configure: the optional SSH host (`hote`), the optional quota statement (`releve_comptes`),
+the notification command (`notification`, off by default), and the agents you start through `agents.lanceur`, which send to
+their model provider what you give them. Questions: anthony@ingevision.cloud.
 
 ## Licenses
 

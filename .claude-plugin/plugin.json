@@ -1,12 +1,14 @@
 {
   "name": "la-boucle-v2",
-  "version": "0.1.0",
+  "displayName": "La boucle",
+  "version": "0.1.1",
   "description": "La boucle v2: conducts one worksite of the method end to end (5 steps) from Claude Code, with a control pane, a band above the prompt, and the operator's decisions recorded word for word. Only the session attached with /la-boucle-v2 <worksite> is concerned.",
   "author": {
     "name": "Anthony Hunt"
   },
   "license": "Apache-2.0",
   "repository": "https://github.com/anthohunt/la-boucle-module",
+  "homepage": "https://ingevision.cloud/?lang=en&p=boucle",
   "types": "./types/index.d.ts",
   "userConfig": {
     "hote": {

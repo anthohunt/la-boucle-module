@@ -6,7 +6,7 @@
     {
       "name": "la-boucle-v2",
       "source": "./",
-      "description": "Control pane, band above the prompt and tools for one worksite of La boucle (early access mods API)"
+      "description": "Control pane, band above the prompt and tools for one worksite of La boucle"
     }
   ]
 }
