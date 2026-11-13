@@ -300,7 +300,7 @@ async function appeler<T>($: EngineInterface, hoteCible: string, commande: strin
 async function rafraichir($: EngineInterface, hoteCible: string): Promise<Vue | null> {
   const r = await read($, rattachement)
   if (!r) return null
-  const rep = await appeler<Vue>($, hoteCible, 'etat', { chantier: r.chantier })
+  const rep = (await appeler($, hoteCible, 'etat', { chantier: r.chantier })) as Reponse<Vue>
   if (!rep.ok) {
     await update($, erreur, () => rep.refus)
     return null
@@ -313,7 +313,7 @@ async function rafraichir($: EngineInterface, hoteCible: string): Promise<Vue | 
 async function relever($: EngineInterface, hoteCible: string) {
   const r = await read($, rattachement)
   if (!r) return
-  const rep = await appeler<Suivi>($, hoteCible, 'suivi', { chantier: r.chantier })
+  const rep = (await appeler($, hoteCible, 'suivi', { chantier: r.chantier })) as Reponse<Suivi>
   if (!(rep.ok && Array.isArray(rep.resultat?.agents) && rep.resultat.comptes && rep.resultat.budget)) return
   const avant = await read($, suivi)
   await update($, suivi, () => rep.resultat)
@@ -350,7 +350,7 @@ async function brancher($: EngineInterface, hoteCible: string, chantier: string,
 }
 
 async function arreterAgent($: EngineInterface, hoteCible: string, chantier: string, nom: string) {
-  const rep = await appeler<{ arret: string }>($, hoteCible, 'arreter_agent', { chantier, nom })
+  const rep = (await appeler($, hoteCible, 'arreter_agent', { chantier, nom })) as Reponse<{ arret: string }>
   $.ui.toast(rep.ok ? `${nom} : ${rep.resultat.arret}` : `${nom} : ${rep.refus}`)
   await relever($, hoteCible)
 }
@@ -368,7 +368,7 @@ async function declarerOutils($: EngineInterface) {
 
 async function rattacher($: EngineInterface, hoteCible: string, chantier: string, role: Rattachement['role']): Promise<{ vue: Vue } | { refus: string }> {
   const session = await $.session.id()
-  const rep = await appeler<Vue>($, hoteCible, 'ouvrir', { chantier, session, role })
+  const rep = (await appeler($, hoteCible, 'ouvrir', { chantier, session, role })) as Reponse<Vue>
   if (!rep.ok) return { refus: rep.refus }
   const ratt: Rattachement = { chantier, role, depuis: new Date(await $.clock.now()).toISOString() }
   await update($, rattachement, () => ratt)
@@ -387,7 +387,7 @@ async function journal($: EngineInterface, hoteCible: string, type: string, donn
 }
 
 async function ouvrirFichier($: EngineInterface, hoteCible: string, chantier: string, chemin: string) {
-  const rep = await appeler<{ contenu: string; chemin: string }>($, hoteCible, 'lire', { chantier, chemin })
+  const rep = (await appeler($, hoteCible, 'lire', { chantier, chemin })) as Reponse<{ contenu: string; chemin: string }>
   const f: Fichier = rep.ok ? { chemin, contenu: rep.resultat.contenu } : { chemin, contenu: rep.refus }
   await update($, fichier, () => f)
   await $.ui.open({ id: PANE_FICHIER, title: chemin })
@@ -417,7 +417,7 @@ async function rouvrirPoint($: EngineInterface, sid: string, point: string, titr
 }
 
 async function ouvrirRelecture($: EngineInterface, hoteCible: string, chantier: string) {
-  const rep = await appeler<{ donnee: { id: string; lot?: string; donnee: unknown; reponse: unknown } | null }>($, hoteCible, 'relire', { chantier, action: 'suivante' })
+  const rep = (await appeler($, hoteCible, 'relire', { chantier, action: 'suivante' })) as Reponse<{ donnee: { id: string; lot?: string; donnee: unknown; reponse: unknown } | null }>
   await update($, donneeRelue, () => (rep.ok ? rep.resultat.donnee : null))
   await $.ui.open({ id: PANE_RELECTURE, title: 'Relecture du banc' })
 }
@@ -512,7 +512,7 @@ export const register: Register = (on, options) => {
         const v = await rafraichir($, H)
         return { text: `Chantier « ${r.chantier} » — ce qui t'attend : ${v?.attend?.quoi ?? 'rien'}.` }
       }
-      const rep = await appeler<{ chantiers: string[] }>($, H, 'liste', {})
+      const rep = (await appeler($, H, 'liste', {})) as Reponse<{ chantiers: string[] }>
       const liste = rep.ok ? rep.resultat.chantiers : []
       return { text: `Ouvre un chantier : ${CMD} <chantier>.${liste.length ? ` Chantiers existants : ${liste.join(', ')}.` : ''}` }
     }
@@ -599,7 +599,7 @@ export const register: Register = (on, options) => {
       const r = await read($, rattachement)
       if (!r) return { deny: `Cette session n'est pas rattachée à un chantier de La boucle (${CMD} <chantier>).` }
       const { tool: _t, tool_use_id: _id, ...args } = e as unknown as Record<string, unknown>
-      const rep = await appeler<Record<string, unknown>>($, H, o.commande, { ...args, chantier: r.chantier })
+      const rep = (await appeler($, H, o.commande, { ...args, chantier: r.chantier })) as Reponse<Record<string, unknown>>
       if (!rep.ok) return { result: `Refusé : ${rep.refus}` }
       const v = await rafraichir($, H)
       if (o.commande === 'etat') return { result: v ? protocole(v, r.role) + `\n\nCe qui attend : ${v.attend?.quoi ?? 'rien'}` : 'État illisible.' }
