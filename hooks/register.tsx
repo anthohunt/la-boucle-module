@@ -272,11 +272,11 @@ const REGLAGE = { python: 'python3', distant: '' }
 const clientSsh = atom({ plugin: 'la-boucle-v2', key: 'ssh' } as const, null)
 
 /** Où joindre le programme : en local (dans le dossier du module), sinon par SSH (celui de Git sous Windows). */
-async function transport($: EngineInterface, h: string): Promise<{ programme: string; ssh: string }> {
+async function transport($: EngineInterface, hoteCible: string): Promise<{ programme: string; ssh: string }> {
   const programme = `${$.plugin.root}/${PROGRAMME_RELATIF}`
   let ssh = await read($, clientSsh)
   if (ssh === null) {
-    if (h) {
+    if (hoteCible) {
       const existe = (chemin: string) => $.fs.stat(chemin).then(() => true, () => false)
       ssh = (await existe(SSH_WINDOWS)) ? SSH_WINDOWS : 'ssh'
     } else ssh = 'ssh'
@@ -287,20 +287,20 @@ async function transport($: EngineInterface, h: string): Promise<{ programme: st
 }
 
 /** Appelle une commande du programme ; un échec de transport devient un refus lisible, jamais une exception. */
-async function appeler<T>($: EngineInterface, h: string, commande: string, args: Record<string, unknown>): Promise<Reponse<T>> {
+async function appeler<T>($: EngineInterface, hoteCible: string, commande: string, args: Record<string, unknown>): Promise<Reponse<T>> {
   try {
-    const { programme, ssh } = await transport($, h)
-    const r = await $.process.run(argvPour(h, programme, commande, ssh, REGLAGE.python, REGLAGE.distant), { stdin: JSON.stringify(args), timeoutMs: 30_000 })
+    const { programme, ssh } = await transport($, hoteCible)
+    const r = await $.process.run(argvPour(hoteCible, programme, commande, ssh, REGLAGE.python, REGLAGE.distant), { stdin: JSON.stringify(args), timeoutMs: 30_000 })
     return lireReponse<T>(r.stdout, r.stderr, r.exitCode)
   } catch (err) {
     return { ok: false, refus: `Programme injoignable : ${String(err).slice(0, 300)}` }
   }
 }
 
-async function rafraichir($: EngineInterface, h: string): Promise<Vue | null> {
+async function rafraichir($: EngineInterface, hoteCible: string): Promise<Vue | null> {
   const r = await read($, rattachement)
   if (!r) return null
-  const rep = await appeler<Vue>($, h, 'etat', { chantier: r.chantier })
+  const rep = await appeler<Vue>($, hoteCible, 'etat', { chantier: r.chantier })
   if (!rep.ok) {
     await update($, erreur, () => rep.refus)
     return null
@@ -310,10 +310,10 @@ async function rafraichir($: EngineInterface, h: string): Promise<Vue | null> {
   return rep.resultat
 }
 
-async function relever($: EngineInterface, h: string) {
+async function relever($: EngineInterface, hoteCible: string) {
   const r = await read($, rattachement)
   if (!r) return
-  const rep = await appeler<Suivi>($, h, 'suivi', { chantier: r.chantier })
+  const rep = await appeler<Suivi>($, hoteCible, 'suivi', { chantier: r.chantier })
   if (!(rep.ok && Array.isArray(rep.resultat?.agents) && rep.resultat.comptes && rep.resultat.budget)) return
   const avant = await read($, suivi)
   await update($, suivi, () => rep.resultat)
@@ -325,34 +325,34 @@ async function relever($: EngineInterface, h: string) {
   const absent = vu === null || (await $.clock.now()) - vu > ABSENT_MS
   for (const a of finis) {
     await $.prompt.submit({ text: `[la-boucle] ${a.role ?? a.nom} a fini${a.sous_etape ? ` (${a.sous_etape})` : ''} : lis son travail et présente-le à l'utilisateur, dans le chat.` })
-    if (absent) await signaler($, h, r.chantier, `${r.chantier} : ${a.role ?? a.nom} a fini, je te le présente dans la conversation.`)
+    if (absent) await signaler($, hoteCible, r.chantier, `${r.chantier} : ${a.role ?? a.nom} a fini, je te le présente dans la conversation.`)
   }
   for (const a of bloques) {
     let relance = ''
     if (a.relancable) {
-      const rr = await appeler($, h, 'relancer', { chantier: r.chantier, nom: a.nom })
+      const rr = await appeler($, hoteCible, 'relancer', { chantier: r.chantier, nom: a.nom })
       relance = rr.ok ? ' Relancé, rien à faire.' : ` ${rr.refus}`
     }
     $.ui.toast(`${a.role ?? a.nom} : bloqué ou en panne.${relance}`)
-    await signaler($, h, r.chantier, `${r.chantier} : ${a.role ?? a.nom} est bloqué ou en panne.${relance || ' Je regarde.'}`)
+    await signaler($, hoteCible, r.chantier, `${r.chantier} : ${a.role ?? a.nom} est bloqué ou en panne.${relance || ' Je regarde.'}`)
   }
 }
 
-async function signaler($: EngineInterface, h: string, chantier: string, texte: string) {
+async function signaler($: EngineInterface, hoteCible: string, chantier: string, texte: string) {
   // La notification est un réglage du programme (désactivée par défaut) : sans commande réglée, rien ne part.
-  await appeler($, h, 'signaler', { chantier, texte })
+  await appeler($, hoteCible, 'signaler', { chantier, texte })
 }
 
-async function brancher($: EngineInterface, h: string, chantier: string, compte: string, action: 'brancher' | 'debrancher') {
-  const rep = await appeler($, h, 'comptes', { chantier, action, compte })
+async function brancher($: EngineInterface, hoteCible: string, chantier: string, compte: string, action: 'brancher' | 'debrancher') {
+  const rep = await appeler($, hoteCible, 'comptes', { chantier, action, compte })
   if (!rep.ok) $.ui.toast(rep.refus)
-  await relever($, h)
+  await relever($, hoteCible)
 }
 
-async function arreterAgent($: EngineInterface, h: string, chantier: string, nom: string) {
-  const rep = await appeler<{ arret: string }>($, h, 'arreter_agent', { chantier, nom })
+async function arreterAgent($: EngineInterface, hoteCible: string, chantier: string, nom: string) {
+  const rep = await appeler<{ arret: string }>($, hoteCible, 'arreter_agent', { chantier, nom })
   $.ui.toast(rep.ok ? `${nom} : ${rep.resultat.arret}` : `${nom} : ${rep.refus}`)
-  await relever($, h)
+  await relever($, hoteCible)
 }
 
 async function declarerOutils($: EngineInterface) {
@@ -366,9 +366,9 @@ async function declarerOutils($: EngineInterface) {
   }
 }
 
-async function rattacher($: EngineInterface, h: string, chantier: string, role: Rattachement['role']): Promise<{ vue: Vue } | { refus: string }> {
+async function rattacher($: EngineInterface, hoteCible: string, chantier: string, role: Rattachement['role']): Promise<{ vue: Vue } | { refus: string }> {
   const session = await $.session.id()
-  const rep = await appeler<Vue>($, h, 'ouvrir', { chantier, session, role })
+  const rep = await appeler<Vue>($, hoteCible, 'ouvrir', { chantier, session, role })
   if (!rep.ok) return { refus: rep.refus }
   const ratt: Rattachement = { chantier, role, depuis: new Date(await $.clock.now()).toISOString() }
   await update($, rattachement, () => ratt)
@@ -380,14 +380,14 @@ async function rattacher($: EngineInterface, h: string, chantier: string, role: 
   return { vue: rep.resultat }
 }
 
-async function journal($: EngineInterface, h: string, type: string, donnees: Record<string, unknown>) {
+async function journal($: EngineInterface, hoteCible: string, type: string, donnees: Record<string, unknown>) {
   const r = await read($, rattachement)
   if (!r) return
-  await appeler($, h, 'evenement', { chantier: r.chantier, type, donnees })
+  await appeler($, hoteCible, 'evenement', { chantier: r.chantier, type, donnees })
 }
 
-async function ouvrirFichier($: EngineInterface, h: string, chantier: string, chemin: string) {
-  const rep = await appeler<{ contenu: string; chemin: string }>($, h, 'lire', { chantier, chemin })
+async function ouvrirFichier($: EngineInterface, hoteCible: string, chantier: string, chemin: string) {
+  const rep = await appeler<{ contenu: string; chemin: string }>($, hoteCible, 'lire', { chantier, chemin })
   const f: Fichier = rep.ok ? { chemin, contenu: rep.resultat.contenu } : { chemin, contenu: rep.refus }
   await update($, fichier, () => f)
   await $.ui.open({ id: PANE_FICHIER, title: chemin })
@@ -416,17 +416,17 @@ async function rouvrirPoint($: EngineInterface, sid: string, point: string, titr
   await $.prompt.submit({ text: `Je veux rouvrir le point ${point} du cadrage (${sid}) : ${titre}.`, asUser: true })
 }
 
-async function ouvrirRelecture($: EngineInterface, h: string, chantier: string) {
-  const rep = await appeler<{ donnee: { id: string; lot?: string; donnee: unknown; reponse: unknown } | null }>($, h, 'relire', { chantier, action: 'suivante' })
+async function ouvrirRelecture($: EngineInterface, hoteCible: string, chantier: string) {
+  const rep = await appeler<{ donnee: { id: string; lot?: string; donnee: unknown; reponse: unknown } | null }>($, hoteCible, 'relire', { chantier, action: 'suivante' })
   await update($, donneeRelue, () => (rep.ok ? rep.resultat.donnee : null))
   await $.ui.open({ id: PANE_RELECTURE, title: 'Relecture du banc' })
 }
 
-async function noterRelecture($: EngineInterface, h: string, chantier: string, id: string, verdict: 'ok' | 'corrige', correction?: string) {
-  const rep = await appeler($, h, 'relire', { chantier, action: 'noter', id, verdict, correction })
+async function noterRelecture($: EngineInterface, hoteCible: string, chantier: string, id: string, verdict: 'ok' | 'corrige', correction?: string) {
+  const rep = await appeler($, hoteCible, 'relire', { chantier, action: 'noter', id, verdict, correction })
   if (!rep.ok) $.ui.toast(rep.refus)
-  await ouvrirRelecture($, h, chantier)
-  await rafraichir($, h)
+  await ouvrirRelecture($, hoteCible, chantier)
+  await rafraichir($, hoteCible)
 }
 
 async function basculer($: EngineInterface, cle: string) {
