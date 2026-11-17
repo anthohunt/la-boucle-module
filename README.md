@@ -2,11 +2,11 @@
 
 # La boucle module
 
-**A Claude Code mod that takes a business need to a small model proved on a sealed exam, in five steps.** A program, not the model, keeps the state, computes the numbers and records every decision of the operator word for word.
+**A Claude Code mod that turns one business task into a small local model that does it alone, checked on test cases no agent ever sees.** It guides you through five steps; a program, not the model, keeps the record and computes the numbers. *La boucle* means “the loop”.
 
 [![La boucle explained in 16 minutes, on a real case (click for the full video)](docs/demo.webp)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view)
 
-*The method on a real case: Kev, a local agent of 0.8 billion parameters. [Full video (15:54)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view). The video counts training as one step; the module splits it into the bench and the loop.*
+*The method on a real case: Kev, a local agent of 0.8 billion parameters. [Full video (15:54)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view). The video counts the bench and the loop as one step.*
 
 <details>
 <summary>Version française de la vidéo</summary>
@@ -18,12 +18,12 @@
 
 ## Using it
 
-- **Five steps.** The objective, the data study, the bench, the loop, the deliverable.
+- **Steps.** Objective, data study, bench, loop, deliverable.
 - **One worksite per session.** `/la-boucle-v2 <worksite>` attaches the session: a control pane on the side, a band above the prompt, the step's instructions injected.
 - **Decisions word for word.** Each decision is stored with the operator's exact words and its time.
 - **Numbers from a program.** Sample sizes, thresholds and the chance of passing come from exact binomial computations.
-- **Seals agents cannot forge.** A step is sealed only when the operator confirms its fingerprint in a file that only root writes (by default), out of the agents' reach.
-- **Agents and loop.** Steps 3 and 4 hand the work to Claude agents started by your launcher and to [`la-boucle-engine`](https://github.com/anthohunt/la-boucle-engine).
+- **Seals.** A step is sealed only when the operator confirms its fingerprint in a file written by root (by default), which agents cannot write without sudo.
+- **Agents and loop.** Steps 3 and 4 hand the work to Claude agents started by your launcher and to [`la-boucle-engine`](https://github.com/anthohunt/la-boucle-engine), whose researcher improves the harness (prompts, rules, code) around the small model.
 
 ## Architecture
 
@@ -36,9 +36,9 @@
 <details>
 <summary>Schémas en français</summary>
 
-![Un geste : l'opérateur répond, Claude appelle un outil du mod, le mod passe du JSON à boucle.py, qui écrit la décision mot pour mot dans le dossier du chantier](docs/architecture.fr.svg)
+![Un geste : l'opérateur répond, Claude appelle un outil du mod, le mod passe du JSON à boucle.py, qui écrit la décision mot pour mot dans le dossier du chantier, puis le volet et le bandeau se mettent à jour](docs/architecture.fr.svg)
 
-![Étapes 3 et 4 : le banc, puis la boucle du moteur avec son juge et son examen scellé](docs/architecture-loop.fr.svg)
+![Étapes 3 et 4 : les fabricants suivent le plan scellé, l'opérateur scelle le banc, l'agent de boucle lance le moteur, le chercheur modifie une copie du harnais, le juge fait tourner le petit modèle sur chaque cas et compare le candidat au champion sur l'examen scellé](docs/architecture-loop.fr.svg)
 </details>
 
 ## Try it
@@ -49,7 +49,11 @@ python3 exemples/demo.py               # two invented worksites, no model, no ne
 claude --plugin-dir .                  # then: /la-boucle-v2 my-worksite
 ```
 
-Or install it, inside Claude Code: `/plugin install la-boucle-v2 --marketplace anthohunt/la-boucle-module`.
+Or install it, inside Claude Code:
+
+```text
+/plugin install la-boucle-v2 --marketplace anthohunt/la-boucle-module
+```
 
 Needs Claude Code 2.1.287 or later (mods) and Python 3.10 or later (standard library only). Installing, tests, layout: [`docs/install.md`](docs/install.md). Settings: [`docs/settings.md`](docs/settings.md).
 
