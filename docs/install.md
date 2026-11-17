@@ -1,0 +1,81 @@
+# Installing and testing the La boucle module
+
+## Requirements
+
+- Claude Code **2.1.287 or later** (mods are on by default from that version), logged in. Claude Code is a separate product of Anthropic, under Anthropic's terms; it is not distributed here. The module was developed on 2.1.295 and passes `claude plugin validate`.
+- Python **3.10 or later**, standard library only, on the machine that runs the program.
+- Node is **not** needed to use the module.
+- Optional: an SSH client, if the program runs on another machine than Claude Code (setting `hote`).
+- A mod runs with your permissions: read the [official mods documentation](https://code.claude.com/docs/en/plugins/mods/overview.md) before installing one.
+
+## Install
+
+The repository is a Claude Code plugin that holds a mod (`hooks/hooks.json` points to `hooks/register.tsx`).
+Official references: [Create a plugin](https://code.claude.com/docs/en/plugins/create.md), [Create a marketplace](https://code.claude.com/docs/en/plugins/create-marketplace.md), [Install plugins](https://code.claude.com/docs/en/plugins/install.md).
+
+**A. For one session, from a clone**
+```bash
+git clone https://github.com/anthohunt/la-boucle-module
+cd <your project>
+claude --plugin-dir /path/to/la-boucle-module
+```
+
+**B. Installed, through the marketplace file of this repository** (`.claude-plugin/marketplace.json`, marketplace `la-boucle`)
+```bash
+claude plugin marketplace add anthohunt/la-boucle-module      # or a local clone: /path/to/la-boucle-module
+claude plugin install la-boucle-v2@la-boucle
+```
+then `/reload-plugins` in an open session. In one step, inside Claude Code: `/plugin install la-boucle-v2 --marketplace anthohunt/la-boucle-module`. A marketplace added from a local clone points at that folder: the module stops loading if you move or delete it.
+
+## Use
+
+```text
+/la-boucle-v2 my-worksite       # opens (or resumes) the worksite "my-worksite" in THIS session only
+/la-boucle-v2                   # lists existing worksites, or shows what waits for you
+/la-boucle-v2 off               # detaches the session
+```
+On a new worksite the module shows a welcome text and waits for the operator to say they are ready. The control pane opens on the side (full-screen terminal or Claude Desktop); the band above the prompt shows the step and what waits for the operator.
+Agents started for a worksite are attached by the environment variable `LA_BOUCLE_CHANTIER=<worksite>`.
+
+## The engine (steps 3 and 4)
+
+Steps 3 and 4 run the loop with the separate repository [`la-boucle-engine`](https://github.com/anthohunt/la-boucle-engine) (Python 3.10+, standard library only), command `python3 -m boucle ...`. The module does not contain it; the command is the setting `moteur`.
+```bash
+pip install git+https://github.com/anthohunt/la-boucle-engine
+```
+The module's own program is `programme/boucle.py`: do not add `programme/` to `PYTHONPATH`, or it would shadow the engine's `boucle` package.
+
+## Tests (no model is called)
+
+```bash
+python3 exemples/demo.py                              # two invented worksites, nothing written outside a temporary folder
+python3 -m unittest discover -s programme/tests       # the program's tests (exact binomial computations: several minutes on a small machine)
+claude plugin test .                                  # the mod's 37 tests (mods test kit)
+claude plugin validate .                              # lists what the mod hooks and calls
+npx -p typescript tsc --noEmit -p tsconfig.json       # optional type check, see below
+```
+The two invented cases (`exemples/`): a closed decision on fictional support tickets (`URGENT` / `A_VERIFIER` / `RIEN`), and an interaction with a fictional task app ("Mini-tâches").
+
+**Type declarations.** `.claude-plugin/types/` (the mods API, built-in tools, connected MCP tools) is written by Claude Code itself each time it loads a mod from a folder you own; it is not redistributed (`.gitignore`). Load the module once (`claude --plugin-dir .`) and `tsconfig.json` can extend it. `types/index.d.ts` is the module's own contract (the shape of the program's answers).
+
+## Layout
+
+| Path | What |
+|---|---|
+| `hooks/` | the mod: `register.tsx` (pane, band, commands, tools), `textes.ts` (instructions injected into the session), `programme.ts` (bridge to the program, local or SSH) |
+| `programme/boucle.py` | the program: state of a worksite in files, one command per gesture (JSON in, JSON out), seals, computations |
+| `programme/parcours.json`, `categories.json`, `methode.json` | the five steps and their sub-steps, need categories, method defaults |
+| `programme/statistiques.py`, `confirmer.py`, `reglages.py` | exact binomial statistics, confirmation script, settings |
+| `programme/gabarits/`, `usage-interface.md` | templates and the format of a production log |
+| `types/index.d.ts` | the module's own contract |
+| `tests/`, `programme/tests/` | mod tests and program tests (`tests/fixtures.ts` is generated by `tests/fabriquer-fixtures.py`) |
+| `tools/architecture-diagrams.py` | draws `docs/architecture*.svg` |
+
+## Licenses
+
+- **Code** (`hooks/`, `programme/*.py`, `tests/`, `exemples/demo.py`, `tools/`, configuration): [Apache License 2.0](../LICENSE), see [`NOTICE`](../NOTICE).
+- **Texts, templates, diagrams and documentation** (READMEs, `docs/`, `programme/parcours.json`, `methode.json`, `categories.json`, `programme/gabarits/`, `programme/usage-interface.md`, `exemples/` data): [Creative Commons Attribution 4.0](../LICENSE-docs).
+- No third-party source code is included. The failure checklist in `methode.json` is inspired by the paper *Harness^2* (Google Research, arXiv:2610.14224); no text or code of the paper is included.
+- Claude Code and its generated type declarations belong to Anthropic and are not redistributed.
+
+Copyright 2026 Anthony Hunt.

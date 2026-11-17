@@ -2,6 +2,24 @@
 
 Everything that depends on your machine is a setting. Nothing is read from a hard-coded path and nothing secret is stored in the repository.
 
+## Two levels, both optional
+
+1. **Plugin options** (`userConfig` in `.claude-plugin/plugin.json`, stored by Claude Code in your settings, `/config`): `hote` (empty = the program runs locally, otherwise an SSH destination such as `user@host.example`), `programme_distant` (path of `boucle.py` on that host), `python` (default `python3`), `nom_court` (also answer `/la-boucle`).
+2. **Program settings** (`boucle-module.json`, model in [`boucle-module.example.json`](../boucle-module.example.json)):
+
+| Key | Meaning | Default |
+|---|---|---|
+| `racine_chantiers` | folder holding one sub-folder per worksite (also `--racine` / `$LA_BOUCLE_V2_RACINE`) | `~/.la-boucle/chantiers` |
+| `confirmations` | `dossier` and `uid` of the confirmation channel (a file only that account can write) | `/var/lib/la-boucle-module/confirmations`, uid 0 |
+| `releve_comptes` | URL or JSON file with quotas of your Claude accounts; empty = no quota information | empty |
+| `comptes` | the Claude accounts that a worksite can plug into its agents (neutral names) | `compte-a`, `compte-b` |
+| `agents.lanceur` | command that starts an agent (list of arguments); `agents.dossier_fins` receives `<name>.fin` when an agent ends | empty |
+| `notification` | `active` (**false by default**) and `commande` (list; the message is appended as last argument) | disabled |
+| `moteur` | command of the engine, given to the agents of steps 3 and 4 | `["python3", "-m", "boucle"]` |
+| `bibliotheque` | optional folder shared between worksites (also `$LA_BOUCLE_BIBLIOTHEQUE`) | empty |
+
+**No secret belongs in the repository or in this file.** If your notification command needs a token, put it in the environment of that command, outside the repository.
+
 ## Where the program reads its settings
 `programme/reglages.py` takes the first file that exists: `$LA_BOUCLE_REGLAGES`, then `boucle-module.json` at the root of the repository (ignored by git),
 then `~/.config/la-boucle-module/boucle-module.json`. A file only needs the keys it changes; the complete model is `boucle-module.example.json`.

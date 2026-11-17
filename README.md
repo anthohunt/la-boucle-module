@@ -1,158 +1,68 @@
-# la-boucle-module — "La boucle" v2 as a Claude Code mod
+**English** · [Français](README.fr.md)
 
-> **Requirements.** This module is a Claude Code *mod* (a plugin with a JavaScript/TypeScript hooks module). Mods are on by default
-> since Claude Code 2.1.287. The module was developed and tested against Claude Code 2.1.295 and passes `claude plugin validate`
-> on 2.1.319. A mod runs with your permissions: read [what this one does](#what-the-module-does-in-5-steps) and the
-> [official mods documentation](https://code.claude.com/docs/en/plugins/mods/overview.md) before installing it.
+# La boucle module
 
-The module drives one **worksite** (*chantier*) of the **La boucle** method from inside Claude Code (terminal, the Code tab of
-Claude Desktop, VS Code): a **control pane** on the side, a **band above the prompt**, instructions injected into the session
-that is attached to the worksite, and a set of tools through which every gesture goes. Every decision of the operator is
-recorded **word for word** with its time; the numbers (sample sizes, thresholds, chances) are computed by a program, never by the model.
+**A Claude Code mod that turns one business task into a small local model that does it alone, checked on test cases no agent ever sees.** It guides you through five steps; a program, not the model, keeps the record and computes the numbers. *La boucle* means “the loop”.
 
-> Code, strings shown to the user and method files are in **French** (the project's origin); this README and `docs/` are in English.
+[![La boucle explained in 16 minutes, on a real case (click for the full video)](docs/demo.webp)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view)
 
-## Video: the method explained in 16 minutes
+*The method on a real case: Kev, a local agent of 0.8 billion parameters. [Full video (15:54)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view). The video counts the bench and the loop as one step.*
 
-An animated presentation walks through the whole method, step by step, on a real case (Kev, a local agent of 0.8 billion parameters that drives a piece of software). Each preview loops a few seconds of the video; click it to watch the whole presentation on Google Drive.
+<details>
+<summary>Version française de la vidéo</summary>
 
-| English (15 min 54) | Français (15 min 52) |
-|---|---|
-| [![La Boucle, explained in English (15 min 54)](docs/images/apercu-en.gif)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view) | [![La boucle, expliquée en français (15 min 52)](docs/images/apercu-fr.gif)](https://drive.google.com/file/d/1TZXAxUeyCGkEj3yFR7hDBZXeerJQxmtA/view) |
+[![La boucle expliquée en 16 minutes (cliquer pour la vidéo complète)](docs/demo.fr.webp)](https://drive.google.com/file/d/1TZXAxUeyCGkEj3yFR7hDBZXeerJQxmtA/view)
 
-The video counts four steps (objective, data, training, deliverable): the module splits training into the bench and the loop, hence the five steps below. The screen captures of the software stay in French in both versions.
+*[Vidéo complète (15:52)](https://drive.google.com/file/d/1TZXAxUeyCGkEj3yFR7hDBZXeerJQxmtA/view)*
+</details>
 
-## What the module does, in 5 steps
+## Using it
 
-The method turns a business process into something a **small model** can do on its own: trained to decide exactly what the operator
-expects, and proved on a sealed exam before delivery. The module walks the operator through five steps (file `programme/parcours.json`):
+- **Steps.** Objective, data study, bench, loop, deliverable.
+- **One worksite per session.** `/la-boucle-v2 <worksite>` attaches the session: a control pane on the side, a band above the prompt, the step's instructions injected.
+- **Decisions word for word.** Each decision is stored with the operator's exact words and its time.
+- **Numbers from a program.** Sample sizes, thresholds and the chance of passing come from exact binomial computations.
+- **Seals.** A step is sealed only when the operator confirms its fingerprint in a file written by root (by default), which agents cannot write without sudo.
+- **Agents and loop.** Steps 3 and 4 hand the work to Claude agents started by your launcher and to [`la-boucle-engine`](https://github.com/anthohunt/la-boucle-engine), whose researcher improves the harness (prompts, rules, code) around the small model.
 
-1. **The objective** - from a need in the operator's words to a complete objective, defined layer by layer, scored by one function, reviewed blind by fresh readers, then **sealed**.
-2. **The data study** - which data, how to get it, how many items per batch, which thresholds, at what cost; checked by a fresh agent, then sealed. The statistics (exact binomial) live in `programme/statistiques.py`.
-3. **The bench** - build, without the operator, a labelled and verified bench according to the sealed plan; the operator may review a part of it, then seals it.
-4. **The loop** - training and evaluation loop on their own: the loop searches better harnesses; the operator authorises the exam of a ready champion. This step uses the **engine** (see below).
-5. **The deliverable** - package the version that passed the exam: framing, build, equivalence, measure, acceptance.
+## Architecture
 
-A step is **sealed** only when the operator confirms its fingerprint through a channel that agents cannot write (see `docs/settings.md`). A sealed step can be reopened only on the operator's explicit word.
+![One decision: the operator answers, Claude calls a tool of the mod, the mod sends JSON to boucle.py, which writes the decision word for word in the worksite folder, then the pane and band refresh](docs/architecture.svg)
 
-## Dependency on the engine: `la-boucle-engine`
+*Numbered arrows: one decision, in order. Yellow tags: where a model is called; the program calls none.*
 
-Steps 3 and 4 run the loop with the separate repository **`la-boucle-engine`** (Python >= 3.10, standard library only), command `python3 -m boucle ...`.
-The module does not contain the engine; the command is a setting (`moteur`, default `python3 -m boucle`) that is given to the agents.
+![Steps 3 and 4: bench builders follow the sealed plan, the operator seals the bench, the loop agent runs the engine, the researcher edits a harness copy, the judge runs the small model on each case and compares the candidate with the champion on the sealed exam](docs/architecture-loop.svg)
+
+<details>
+<summary>Schémas en français</summary>
+
+![Un geste : l'opérateur répond, Claude appelle un outil du mod, le mod passe du JSON à boucle.py, qui écrit la décision mot pour mot dans le dossier du chantier, puis le volet et le bandeau se mettent à jour](docs/architecture.fr.svg)
+
+![Étapes 3 et 4 : les fabricants suivent le plan scellé, l'opérateur scelle le banc, l'agent de boucle lance le moteur, le chercheur modifie une copie du harnais, le juge fait tourner le petit modèle sur chaque cas et compare le candidat au champion sur l'examen scellé](docs/architecture-loop.fr.svg)
+</details>
+
+## Try it
 
 ```bash
-pip install git+https://github.com/anthohunt/la-boucle-engine
-```
-Note: the program of this module is itself called `programme/boucle.py`. Do not add the `programme/` folder to `PYTHONPATH`, or it would shadow the engine's `boucle` package.
-
-## Requirements
-
-- Claude Code **2.1.287 or later**, logged in (a separate product of Anthropic, under Anthropic's terms; it is not distributed here).
-- Python **3.10 or later** (standard library only) on the machine that runs the program.
-- Node is **not** needed to use the module. To run the module's TypeScript tests you only need Claude Code (`claude plugin test`).
-- Optional: an SSH client, if the program runs on another machine than Claude Code.
-
-## Install
-
-The module is a Claude Code plugin that holds a mod (`hooks/hooks.json` points to `hooks/register.tsx`). Official ways to load a plugin:
-[Create a plugin - develop without a marketplace](https://code.claude.com/docs/en/plugins/create.md) and
-[Install plugins](https://code.claude.com/docs/en/plugins/install.md). Two ways:
-
-**A. For one session, from a clone (simplest)**
-```bash
-git clone https://github.com/anthohunt/la-boucle-module
-cd <your project>
-claude --plugin-dir /path/to/la-boucle-module
+git clone https://github.com/anthohunt/la-boucle-module && cd la-boucle-module
+python3 exemples/demo.py               # two invented worksites, no model, no network
+claude --plugin-dir .                  # then: /la-boucle-v2 my-worksite
 ```
 
-**B. Installed, through the marketplace file of this repository** (`.claude-plugin/marketplace.json`, marketplace `la-boucle`)
-```bash
-claude plugin marketplace add /path/to/la-boucle-module      # or: anthohunt/la-boucle-module
-claude plugin install la-boucle-v2@la-boucle
-```
-then run `/reload-plugins` in an open session. Once the repository is published, the one-step form also works: `/plugin install la-boucle-v2 --marketplace anthohunt/la-boucle-module`. The marketplace points at your clone: the module stops loading if you move or delete it.
-See [Create a marketplace](https://code.claude.com/docs/en/plugins/create-marketplace.md) and [Install plugins](https://code.claude.com/docs/en/plugins/install.md).
+Or install it, inside Claude Code:
 
-Then, in the session you want to attach:
 ```text
-/la-boucle-v2 my-worksite       # opens (or resumes) the worksite "my-worksite" in THIS session only
-/la-boucle-v2                   # lists existing worksites, or shows what waits for you
-/la-boucle-v2 off               # detaches the session
+/plugin install la-boucle-v2 --marketplace anthohunt/la-boucle-module
 ```
-On a new worksite the module shows a welcome text and waits for the operator to say they are ready; the control pane opens on the side
-(full-screen terminal or Claude Desktop) and the band above the prompt shows the step and what waits for the operator.
-Agents launched for a worksite are attached by the environment variable `LA_BOUCLE_CHANTIER=<worksite>`.
 
-### About the generated type declarations
-`.claude-plugin/types/` (declarations of the mods API, of the built-in tools and of the connected MCP tools) is **written by Claude Code itself** each time it
-loads a mod from a folder you own, and it is **not redistributed** here (it is in `.gitignore`). Load the module once in a session (`claude --plugin-dir .`) and Claude Code lays it
-down; `tsconfig.json` extends it for editor type checking. `types/index.d.ts` is the module's **own** contract (the shape of the program's answers) and is part of this repository.
+Needs Claude Code 2.1.287 or later (mods) and Python 3.10 or later (standard library only). Installing, tests, layout: [`docs/install.md`](docs/install.md). Settings: [`docs/settings.md`](docs/settings.md).
 
-## Settings
+## State
 
-Two levels, both optional:
-
-1. **Plugin options** (`userConfig` in `.claude-plugin/plugin.json`, stored by Claude Code in your settings, `/config`): `hote` (empty = the program runs locally, otherwise an SSH destination such as `user@host.example`),
-   `programme_distant` (path of `boucle.py` on that host), `python` (default `python3`), `nom_court` (also answer `/la-boucle`).
-2. **Program settings** (`boucle-module.json`, model in [`boucle-module.example.json`](boucle-module.example.json)), read by `programme/reglages.py` from `$LA_BOUCLE_REGLAGES`, or `./boucle-module.json`, or `~/.config/la-boucle-module/boucle-module.json`:
-
-| Key | Meaning | Default |
-|---|---|---|
-| `racine_chantiers` | folder holding one sub-folder per worksite (also `--racine` / `$LA_BOUCLE_V2_RACINE`) | `~/.la-boucle/chantiers` |
-| `confirmations` | `dossier` and `uid` of the confirmation channel (a file only that account can write) | `/var/lib/la-boucle-module/confirmations`, uid 0 |
-| `releve_comptes` | URL or JSON file with quotas of your Claude accounts; empty = no quota information | empty |
-| `comptes` | the Claude accounts that a worksite can plug into its agents (neutral names) | `compte-a`, `compte-b` |
-| `agents.lanceur` | command that starts an agent (list of arguments); `agents.dossier_fins` receives `<name>.fin` when an agent ends | empty |
-| `notification` | `active` (**false by default**) and `commande` (list; the message is appended as last argument) | disabled |
-| `moteur` | command of the engine, given to the agents of steps 3 and 4 | `["python3", "-m", "boucle"]` |
-| `bibliotheque` | optional folder shared between worksites (also `$LA_BOUCLE_BIBLIOTHEQUE`) | empty |
-
-**No secret belongs in the repository or in this file.** If your notification command needs a token (a chat bot, a push service), put it in the environment of that command, outside the repository.
-Details, the format of the account statement and the confirmation channel: [`docs/settings.md`](docs/settings.md).
-
-## Try it without any model
-
-```bash
-python3 exemples/demo.py        # two invented worksites, no model, no network, nothing written outside a temporary folder
-python3 -m unittest discover -s programme/tests    # the program's tests (exact binomial computations: several minutes on a small machine)
-claude plugin test .            # the mod's 37 tests (TypeScript, in the mods test kit; needs Claude Code, calls no model)
-claude plugin validate .        # lists what the mod hooks and calls
-# type check (optional): once Claude Code has written .claude-plugin/types by loading the mod in a session,
-npx -p typescript tsc --noEmit -p tsconfig.json
-```
-The two invented cases (`exemples/`): **(1)** a closed decision on fictional support tickets (`URGENT` / `A_VERIFIER` / `RIEN`) and **(2)** an interaction with a fictional task app ("Mini-tâches").
-
-## Layout
-
-| Path | What |
-|---|---|
-| `hooks/` | the mod: `register.tsx` (pane, band, commands, tools), `textes.ts` (instructions injected into the session), `programme.ts` (bridge to the program) |
-| `programme/boucle.py` | the program: state of a worksite in files, one command per gesture (JSON in, JSON out), seals, computations |
-| `programme/parcours.json`, `categories.json`, `methode.json` | the generic path (5 steps), need categories, method defaults |
-| `programme/statistiques.py`, `confirmer.py`, `reglages.py` | exact binomial statistics, confirmation script, settings |
-| `programme/gabarits/`, `usage-interface.md` | templates and the format of a production log |
-| `types/index.d.ts` | the module's own contract |
-| `tests/`, `programme/tests/` | mod tests and program tests |
-| `docs/` | settings, and the history of version 1 |
-
-## Privacy
-
-The module collects no data for its author and sends nothing to a service run by its author. What it records (the worksite
-files: the objective, the operator's decisions word for word, the measures) stays in the worksite folder on your machine
-(`racine_chantiers`, default `~/.la-boucle/chantiers`), or on the SSH host you set yourself, until you delete it. Data leaves
-that folder only through what you configure: the optional SSH host (`hote`), the optional quota statement (`releve_comptes`),
-the notification command (`notification`, off by default), and the agents you start through `agents.lanceur`, which send to
-their model provider what you give them. Questions: anthony@ingevision.cloud.
-
-## Licenses
-
-- **Code** (`hooks/`, `programme/*.py`, `tests/`, `exemples/demo.py`, configuration): [Apache License 2.0](LICENSE), see [`NOTICE`](NOTICE).
-- **Texts, templates and documentation** (this README, `docs/`, `programme/parcours.json`, `methode.json`, `categories.json`, `programme/gabarits/`, `programme/usage-interface.md`, `exemples/` data): [Creative Commons Attribution 4.0](LICENSE-docs).
-- No third-party source code is included. The failure checklist in `methode.json` is inspired by the paper *Harness^2* (Google Research, arXiv:2610.14224); no text or code of the paper is included.
-- Claude Code and its generated type declarations belong to Anthropic and are not redistributed.
-
-Copyright 2026 Anthony Hunt.
+- **Early access** (version 0.1.1). On a real worksite, steps 1 and 2 are sealed and step 3 is under way; steps 3 to 5 are otherwise covered by tests on invented cases.
+- Code, on-screen text and method files are in French; the documentation is in English.
+- Code under [Apache 2.0](LICENSE), texts under [CC BY 4.0](LICENSE-docs). Nothing is sent to the author: [`docs/privacy.md`](docs/privacy.md).
 
 ---
 
-**Anthony Hunt** · [Project page on ingevision.cloud](https://ingevision.cloud/?lang=en&p=boucle) · [LinkedIn](https://www.linkedin.com/in/anthony-hunt-3948a9196) · [GitHub profile](https://github.com/anthohunt)
+**Anthony Hunt** · [ingevision.cloud](https://ingevision.cloud/?lang=en&p=boucle) · [LinkedIn](https://www.linkedin.com/in/anthony-hunt-3948a9196) · [GitHub](https://github.com/anthohunt)
