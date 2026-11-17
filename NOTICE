@@ -11,7 +11,7 @@ This product contains no third-party source code. It is written for the Claude C
 mods API (a Claude Code plugin with a hooks module); Claude Code is a separate product
 of Anthropic, subject to Anthropic's terms, and is not distributed here. The type
 declarations that Claude Code writes next to a mod (.claude-plugin/types/) are not
-redistributed: see the README.
+redistributed: see docs/install.md.
 
 The failure checklist and the two-level research loop in programme/methode.json
 ("greffes_h2") are inspired by the paper Harness^2 (Google Research, arXiv:2610.14224).
