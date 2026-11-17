@@ -5,7 +5,7 @@ OUT = sys.argv[1]
 BLUE, INK, MUTED, LINE, ZONE, YEL, YELINK = '#1f4fd1', '#14213d', '#5d6b82', '#c9d1dd', '#e6ebf2', '#ffd23f', '#5a4500'
 FONT = 'IBM Plex Sans, Segoe UI, Helvetica Neue, Arial, sans-serif'
 MONO = 'IBM Plex Mono, Consolas, monospace'
-LX, RX, BW, BH = 40, 280, 160, 56
+LX, RX, BW, BH = 30, 280, 170, 56
 
 def tw(s, size): return len(s) * size * 0.56
 
@@ -20,8 +20,8 @@ class D:
         x = LX if col == 'L' else RX
         st = f'stroke="{BLUE}" stroke-width="2.2"' if strong else f'stroke="{LINE}" stroke-width="1.4"'
         s.p.append(f'<rect x="{x}" y="{y}" width="{BW}" height="{BH}" rx="10" fill="#fff" {st}/>'
-                   f'<text x="{x+12}" y="{y+24}" fill="{INK}" font-size="15" font-weight="600">{E(t)}</text>'
-                   f'<text x="{x+12}" y="{y+44}" fill="{MUTED}" font-size="13">{E(sub)}</text>')
+                   f'<text x="{x+12}" y="{y+24}" fill="{INK}" font-size="16" font-weight="600">{E(t)}</text>'
+                   f'<text x="{x+12}" y="{y+44}" fill="{MUTED}" font-size="13.5">{E(sub)}</text>')
         if model:
             w = tw(model, 10.5) + 12
             py = y - 9 if pill == 'top' else y + BH - 9
@@ -32,14 +32,14 @@ class D:
         s.p.append(f'<path d="{d}" fill="none" stroke="{c}" stroke-width="{sw}" marker-end="url(#{m})"/>')
         if label:
             x, y = at
-            w = tw(label, 12.5) + 10
+            w = tw(label, 13) + 10
             fw = '400' if grey else '600'
             if rot:
                 s.p.append(f'<g transform="rotate(-90 {x} {y})"><rect x="{x-w/2}" y="{y-9}" width="{w}" height="18" rx="4" fill="#fff"/>'
-                           f'<text x="{x}" y="{y+4.5}" text-anchor="middle" fill="{c}" font-size="12.5" font-weight="{fw}">{E(label)}</text></g>')
+                           f'<text x="{x}" y="{y+4.5}" text-anchor="middle" fill="{c}" font-size="13" font-weight="{fw}">{E(label)}</text></g>')
             else:
                 s.p.append(f'<rect x="{x-w/2}" y="{y-9}" width="{w}" height="18" rx="4" fill="#fff"/>'
-                           f'<text x="{x}" y="{y+4.5}" text-anchor="middle" fill="{c}" font-size="12.5" font-weight="{fw}">{E(label)}</text>')
+                           f'<text x="{x}" y="{y+4.5}" text-anchor="middle" fill="{c}" font-size="13" font-weight="{fw}">{E(label)}</text>')
             if num:
                 cx, cy = (x - w/2 - 12, y) if numpos == 'left' else (x, y - 21)
                 s.p.append(f'<circle cx="{cx}" cy="{cy}" r="10" fill="#fff" stroke="{BLUE}" stroke-width="1.6"/>'
@@ -110,10 +110,10 @@ for lang, t in T.items():
     d.arrow('M360 412H140V460', t['a4'], (240, 412), 4)
     d.arrow('M330 180V130H170V96', t['a5'], (275, 130), 5)
     d.arrow('M200 348H280', t['g_rules'], (240, 348), grey=True)
-    d.arrow('M440 68H468V348H440', t['g_fp'], (468, 210), grey=True, rot=True)
+    d.arrow('M450 68H469V348H450', t['g_fp'], (469, 210), grey=True, rot=True)
     d.arrow('M200 628H280', t['g_runs'], (240, 628), grey=True)
     d.arrow('M320 600V516', t['g_bench'], (320, 556), grey=True)
-    d.arrow('M40 628H12V214H40', t['g_same'], (12, 420), grey=True, rot=True)
+    d.arrow('M30 628H11V214H30', t['g_same'], (11, 420), grey=True, rot=True)
     open(os.path.join(OUT, f'architecture{sfx}.svg'), 'w').write(d.svg())
     # Backend detail
     d = D(480, 540, t['t2'])
