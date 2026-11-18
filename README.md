@@ -4,16 +4,15 @@
 
 **A Claude Code mod that turns one business task into a small local model that does it alone, checked on test cases no agent ever sees.** It guides you through five steps; a program, not the model, keeps the record and computes the numbers. *La boucle* means “the loop”.
 
-[![La boucle explained in 16 minutes, on a real case (click for the full video)](docs/demo.webp)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view)
+![La boucle explained in 16 minutes, on a real case](docs/demo.webp)
 
-*The method on a real case: Kev, a local agent of 0.8 billion parameters. [Full video (15:54)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view). The video counts the bench and the loop as one step.*
+*The method on a real case: Kev, a local agent of 0.8 billion parameters. The video counts the bench and the loop as one step.*
 
 <details>
 <summary>Version française de la vidéo</summary>
 
-[![La boucle expliquée en 16 minutes (cliquer pour la vidéo complète)](docs/demo.fr.webp)](https://drive.google.com/file/d/1TZXAxUeyCGkEj3yFR7hDBZXeerJQxmtA/view)
+![La boucle expliquée en 16 minutes](docs/demo.fr.webp)
 
-*[Vidéo complète (15:52)](https://drive.google.com/file/d/1TZXAxUeyCGkEj3yFR7hDBZXeerJQxmtA/view)*
 </details>
 
 ## Using it

@@ -4,16 +4,15 @@
 
 **Un mod Claude Code qui fait d'une tâche métier un petit modèle local capable de la faire seul, vérifié sur des cas de test qu'aucun agent ne voit jamais.** Il guide en cinq étapes ; un programme, pas le modèle, tient le registre et fait les calculs.
 
-[![La boucle expliquée en 16 minutes, sur un cas réel (cliquer pour la vidéo complète)](docs/demo.webp)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view)
+![La boucle expliquée en 16 minutes, sur un cas réel](docs/demo.webp)
 
-*La méthode sur un cas réel : Kev, un agent local de 0,8 milliard de paramètres. [Vidéo complète en anglais (15:54)](https://drive.google.com/file/d/1B0ZIb4txHxiYe0JcUWBq3rJRpRpqhCxr/view). La vidéo compte le banc et la boucle comme une seule étape.*
+*La méthode sur un cas réel : Kev, un agent local de 0,8 milliard de paramètres. La vidéo compte le banc et la boucle comme une seule étape.*
 
 <details>
 <summary>Version française de la vidéo</summary>
 
-[![La boucle expliquée en 16 minutes (cliquer pour la vidéo complète)](docs/demo.fr.webp)](https://drive.google.com/file/d/1TZXAxUeyCGkEj3yFR7hDBZXeerJQxmtA/view)
+![La boucle expliquée en 16 minutes](docs/demo.fr.webp)
 
-*[Vidéo complète (15:52)](https://drive.google.com/file/d/1TZXAxUeyCGkEj3yFR7hDBZXeerJQxmtA/view)*
 </details>
 
 ## Ce qu'on fait avec
